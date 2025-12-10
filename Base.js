@@ -197,4 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+
 });
+//Rafael estuvo aquí//

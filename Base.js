@@ -74,37 +74,37 @@ const productsData = [
   },
   {
     id: 9,
-    name: "imagen de helado X.png",
+    name: "Chocolate Menta",
     price: 23.99,
     originalPrice: 28.99,
-    image: "helado - 1.png",
+    image: "imagen de helado X.png",
     category: "cremosos",
     description: "Helado de menta fresca con chispas de chocolate negro."
   },
   {
     id: 10,
-    name: "imagen de helado XX.png",
+    name: "Café Colombiano",
     price: 26.99,
     originalPrice: 31.99,
-    image: "helado - 2.png",
+    image: "imagen de helado XX.png",
     category: "especiales",
     description: "Café colombiano tostado oscuro con caramelo salado."
   },
   {
     id: 11,
-    name: "imagen de helado XXX.png",
+    name: "Pistachos Sicilianos",
     price: 31.99,
     originalPrice: 36.99,
-    image: "helado - 3.png",
+    image: "imagen de helado XXX.png",
     category: "especiales",
     description: "Pistachos de Sicilia tostados con trozos de almendra caramelizada."
   },
   {
     id: 12,
-    name: "imagen de helado XXXX.png",
+    name: "Limón Siciliano",
     price: 21.99,
     originalPrice: 26.99,
-    image: "helado - 5.png",
+    image: "imagen de helado XXXX.png",
     category: "frutales",
     description: "Limón siciliano fresco con ralladura de limón y merengue."
   }
@@ -200,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 //Josué estuvo aquí ⊙⁠﹏⁠⊙//
+
 
 
 

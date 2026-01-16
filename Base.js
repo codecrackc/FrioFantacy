@@ -74,7 +74,7 @@ const productsData = [
   },
   {
     id: 9,
-    name: "Menta Chocolate",
+    name: "imagen de helado X.png",
     price: 23.99,
     originalPrice: 28.99,
     image: "helado - 1.png",
@@ -83,7 +83,7 @@ const productsData = [
   },
   {
     id: 10,
-    name: "Café Colombiano",
+    name: "imagen de helado XX.png",
     price: 26.99,
     originalPrice: 31.99,
     image: "helado - 2.png",
@@ -92,7 +92,7 @@ const productsData = [
   },
   {
     id: 11,
-    name: "Pistacho Siciliano",
+    name: "imagen de helado XXX.png",
     price: 31.99,
     originalPrice: 36.99,
     image: "helado - 3.png",
@@ -101,7 +101,7 @@ const productsData = [
   },
   {
     id: 12,
-    name: "Limón Siciliano",
+    name: "imagen de helado XXXX.png",
     price: 21.99,
     originalPrice: 26.99,
     image: "helado - 5.png",
@@ -200,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 //Josué estuvo aquí ⊙⁠﹏⁠⊙//
+
 
 
 

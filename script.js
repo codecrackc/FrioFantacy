@@ -109,4 +109,5 @@ document.addEventListener('DOMContentLoaded', () => {
         // Opcional: Desactivar animación de pulso en dispositivos que reducen movimiento
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             whatsappBtn.classList.remove('whatsapp-pulse');
+
         }

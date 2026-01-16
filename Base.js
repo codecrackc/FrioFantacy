@@ -2,7 +2,7 @@
 const productsData = [
   {
     id: 1,
-    name: "Pan Integral",
+    name: "Triple Cono",
     price: 29.55,
     originalPrice: 35.55,
     image: "helado - 1.png",
@@ -11,7 +11,7 @@ const productsData = [
   },
   {
     id: 2,
-    name: "Chocolate con Cayena",
+    name: "Frutos del bosque",
     price: 19.55,
     originalPrice: 22.55,
     image: "helado - 2.png",
@@ -20,7 +20,7 @@ const productsData = [
   },
   {
     id: 3,
-    name: "Maíz Dulce",
+    name: "Triple Copa",
     price: 29.55,
     originalPrice: 35.55,
     image: "helado - 3.png",
@@ -29,7 +29,7 @@ const productsData = [
   },
   {
     id: 4,
-    name: "Vainilla Francesa",
+    name: "Triple Cono Mini",
     price: 24.99,
     originalPrice: 29.99,
     image: "helado - 1.png",
@@ -56,7 +56,7 @@ const productsData = [
   },
   {
     id: 7,
-    name: "Mango Tailandés",
+    name: "Chocolate Tailandés",
     price: 25.99,
     originalPrice: 30.99,
     image: "helado - 4.png",
@@ -65,7 +65,7 @@ const productsData = [
   },
   {
     id: 8,
-    name: "Cookies & Cream",
+    name: "Triple Copa Etiqueta negra",
     price: 27.99,
     originalPrice: 32.99,
     image: "helado - 3.png",
@@ -200,3 +200,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 //Rafael estuvo aquí//
+

@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FRIO FANTASY | Heladería Artesanal - Contacto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --primary: #e91e63;
+      --primary-dark: #c2185b;
+      --secondary: #ff9800;
+      --light: #fff5f8;
+      --dark: #333;
+      --gray: #666;
+      --light-gray: #f5f5f5;
+      --shadow: 0 5px 20px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+      --border-radius: 20px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Header Styles */
+    #header {
+      background: white;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo img {
+      height: 50px;
+    }
+    
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 30px;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    
+    .header-buttons {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(233, 30, 99, 0.3);
+    }
+    
+    .cart-btn, .user-btn {
+      background: var(--light);
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    .cart-btn:hover, .user-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .cart-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--primary);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .hamburger {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    /* Contact Page Styles */
+    .contacto-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 20px;
+    }
+    
+    .contacto-titulo-seccion {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: var(--dark);
+      position: relative;
+    }
+    
+    .contacto-titulo-seccion:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    
+    .contacto-subtitulo {
+      text-align: center;
+      color: var(--gray);
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 1.1rem;
+      padding: 0 15px;
+    }
+    
+    .contacto-contenido {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+    
+    .info-contacto {
+      flex: 1;
+      min-width: 300px;
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+    
+    .info-contacto-titulo {
+      color: var(--primary);
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--light);
+      font-size: 1.5rem;
+    }
+    
+    .item-contacto {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      transition: var(--transition);
+      background-color: var(--light);
+    }
+    
+    .item-contacto:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(233, 30, 99, 0.1);
+      background-color: white;
+    }
+    
+    .icono-contacto {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    
+    .titulo-item {
+      margin-bottom: 5px;
+      color: var(--dark);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .texto-item {
+      color: var(--gray);
+      line-height: 1.6;
+    }
+    
+    .mapa-contacto {
+      flex: 1;
+      min-width: 300px;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      height: 400px;
+      position: relative;
+      background: #f8f8f8;
+    }
+    
+    #mapa-contacto {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+    
+    .mapa-cargando {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--primary);
+      font-size: 1.2rem;
+      z-index: 0;
+      text-align: center;
+    }
+    
+    .mapa-contacto,
+    #mapa-contacto,
+    .leaflet-container {
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+    }
+    
+    .leaflet-container {
+      background: #f8f8f8 !important;
+    }
+    
+    .leaflet-control-attribution {
+      font-size: 10px !important;
+      padding: 2px 5px !important;
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-radius: 3px !important;
+    }
+    
+    .formulario-contacto {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 35px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+    }
+    
+    .formulario-titulo {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+    
+    .formulario-descripcion {
+      color: var(--gray);
+      margin-bottom: 25px;
+      font-size: 1.05rem;
+    }
+    
+    .grupo-formulario {
+      margin-bottom: 18px;
+    }
+    
+    .label-formulario {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .input-formulario,
+    .select-formulario,
+    .textarea-formulario {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--light-gray);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: var(--transition);
+      background-color: var(--light-gray);
+      color: var(--dark);
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .input-formulario:focus,
+    .select-formulario:focus,
+    .textarea-formulario:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+      background-color: white;
+    }
+    
+    .fila-formulario {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .fila-formulario .grupo-formulario {
+      flex: 1;
+      min-width: 250px;
+    }
+    
+    .tipo-queja {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .tipo-queja-label {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 10px 18px;
+      background-color: var(--light);
+      border-radius: 30px;
+      transition: var(--transition);
+      border: 2px solid var(--light);
+      color: var(--dark);
+      margin-bottom: 0;
+      font-size: 0.95rem;
+    }
+    
+    .tipo-queja-input {
+      width: auto;
+      margin-right: 8px;
+    }
+    
+    .tipo-queja-label:hover {
+      background-color: rgba(233, 30, 99, 0.1);
+      border-color: var(--primary);
+    }
+    
+    .tipo-queja-input:checked + .tipo-queja-label {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+    
+    .boton-enviar-contacto {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      padding: 16px 35px;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+    }
+    
+    .boton-enviar-contacto:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(233, 30, 99, 0.4);
+    }
+    
+    .mensaje-confirmacion {
+      display: none;
+      background-color: #e8f5e9;
+      color: #1b5e20;
+      padding: 18px;
+      border-radius: 10px;
+      margin-top: 20px;
+      text-align: center;
+      border-left: 4px solid #4CAF50;
+    }
+    
+    .texto-pequeno {
+      font-size: 0.85rem;
+      color: var(--gray);
+      display: block;
+      margin-top: 4px;
+    }
+    
+    .icono-helado {
+      color: var(--secondary);
+      margin-right: 6px;
+    }
+    
+    .archivo-input::file-selector-button {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      margin-right: 15px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .archivo-input::file-selector-button:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #b2104a 100%);
+    }
+    
+    /* WhatsApp Button */
+    .whatsapp-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #25D366;
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .whatsapp-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
+    }
+    
+    .whatsapp-pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+    }
+    
+    .whatsapp-tooltip {
+      position: absolute;
+      right: 70px;
+      background: #25D366;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    
+    .whatsapp-btn:hover .whatsapp-tooltip {
+      opacity: 1;
+    }
+    
+    /* Footer Styles */
+    footer {
+      background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+      color: white;
+      padding: 50px 0 20px;
+      margin-top: 30px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .footer-col h4 {
+      color: white;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .footer-col h4:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--primary);
+    }
+    
+    .footer-logo img {
+      height: 60px;
+      margin-bottom: 15px;
+    }
+    
+    .footer-links {
+      list-style: none;
+    }
+    
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+    
+    .footer-links a {
+      color: #ddd;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    .footer-links a:hover {
+      color: var(--primary);
+      padding-left: 5px;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .social-link {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: var(--transition);
+    }
+    
+    .social-link:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+    
+    .newsletter-form {
+      display: flex;
+      margin-top: 15px;
+    }
+    
+    .newsletter-form input {
+      flex: 1;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 30px 0 0 30px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .newsletter-form button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0 20px;
+      border-radius: 0 30px 30px 0;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .newsletter-form button:hover {
+      background: var(--primary-dark);
+    }
+    
+    .contact-info p {
+      margin-bottom: 8px;
+      color: #ddd;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .copyright {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+      
+      .nav-links {
+        position: fixed;
+        top: 80px;
+        left: -100%;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        transition: var(--transition);
+        box-shadow: var(--shadow);
+      }
+      
+      .nav-links.active {
+        left: 0;
+      }
+      
+      .contacto-titulo-seccion {
+        font-size: 2rem;
+      }
+      
+      .contacto-contenido {
+        flex-direction: column;
+        gap: 25px;
+      }
+      
+      .fila-formulario {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .tipo-queja {
+        flex-direction: column;
+      }
+      
+      .item-contacto {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .icono-contacto {
+        margin-bottom: 10px;
+      }
+      
+      .formulario-contacto {
+        padding: 25px;
+      }
+      
+      .mapa-contacto {
+        height: 350px;
+        min-height: 350px;
+      }
+      
+      .whatsapp-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 55px;
+        height: 55px;
+        font-size: 25px;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .contacto-container {
+        padding: 30px 15px 15px;
+      }
+      
+      .contacto-titulo-seccion {
+        font-size: 1.8rem;
+      }
+      
+      .info-contacto, .formulario-contacto {
+        padding: 20px;
+      }
+      
+      .mapa-contacto {
+        height: 300px;
+        min-height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header id="header">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="logo.png" alt="Frio Fantasy"/>
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="index.html#about">Nosotros</a></li>
+          <li><a href="index.html#products">Menú</a></li>
+          <li><a href="index.html#testimonials">Testimonios</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </nav>
+      
+      <div class="header-buttons">
+        <div class="user-info" id="userInfo" style="display: none;">
+          <span id="userName"></span>
+          <button id="logoutBtn" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+        
+        <a href="index.html#products" class="btn btn-primary">Comprar Ahora</a>
+        <button class="cart-btn" id="cartBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="user-btn" id="userBtn">
+          <i class="fas fa-user"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contact Content -->
+  <div class="contacto-container">
+    <h1 class="contacto-titulo-seccion">Contáctanos</h1>
+    <p class="contacto-subtitulo">Tu opinión es importante para nosotros. Envíanos tus quejas, sugerencias o solicitudes para seguir mejorando y endulzando tus momentos. Estamos aquí para escucharte y hacer tu experiencia aún más dulce. Nuestro equipo responde en máximo 24 horas hábiles.</p>
+    
+    <div class="contacto-contenido">
+      <div class="info-contacto">
+        <h2 class="info-contacto-titulo"><i class="fas fa-info-circle"></i> Información de Contacto</h2>
+        
+        <div class="item-contacto">
+          <div class="icono-contacto">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="texto-contacto">
+            <h3 class="titulo-item">Dirección Principal</h3>
+            <p class="texto-item">Av. Los Helados 456, Distrito Dulce, Ciudad Azucarada, CP 12345<br><strong>Sucursal Centro:</strong> Calle Principal 123, Plaza Central</p>
+          </div>
+        </div>
+        
+        <div class="item-contacto">
+          <div class="icono-contacto">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div class="texto-contacto">
+            <h3 class="titulo-item">Teléfonos de Contacto</h3>
+            <p class="texto-item"><strong>Pedidos a Domicilio:</strong> (55) 1234-5678<br><strong>Atención al Cliente:</strong> (55) 8765-4321<br><strong>WhatsApp Pedidos:</strong> (55) 9999-8888<br><strong>Fax:</strong> (55) 1234-5000</p>
+          </div>
+        </div>
+        
+        <div class="item-contacto">
+          <div class="icono-contacto">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="texto-contacto">
+            <h3 class="titulo-item">Correo Electrónico</h3>
+            <p class="texto-item"><strong>General:</strong> contacto@friofantasy.com<br><strong>Pedidos:</strong> pedidos@friofantasy.com<br><strong>Eventos:</strong> eventos@friofantasy.com<br><strong>Sugerencias:</strong> sugerencias@friofantasy.com<br><strong>Trabajo:</strong> empleo@friofantasy.com</p>
+          </div>
+        </div>
+        
+        <div class="item-contacto">
+          <div class="icono-contacto">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="texto-contacto">
+            <h3 class="titulo-item">Horarios de Atención</h3>
+            <p class="texto-item"><strong>Lunes a Jueves:</strong> 11:00 AM - 10:00 PM<br><strong>Viernes y Sábado:</strong> 11:00 AM - 11:00 PM<br><strong>Domingos y Festivos:</strong> 12:00 PM - 9:00 PM<br><strong>Delivery:</strong> Todos los días hasta las 10:30 PM<br><strong>Oficinas Administrativas:</strong> Lun-Vie 9:00 AM - 6:00 PM</p>
+          </div>
+        </div>
+        
+        <div class="item-contacto">
+          <div class="icono-contacto">
+            <i class="fas fa-concierge-bell"></i>
+          </div>
+          <div class="texto-contacto">
+            <h3 class="titulo-item">Servicios Especiales</h3>
+            <p class="texto-item">• Fiestas infantiles personalizadas<br>• Eventos corporativos y empresariales<br>• Helados para bodas y recepciones<br>• Catering para celebraciones grandes<br>• Cursos de helado artesanal mensuales<br>• Tours educativos de fabricación<br>• Helados personalizados con logos<br>• Servicio de mesa de postres</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mapa-contacto">
+        <div class="mapa-cargando" id="mapaCargando">
+          <i class="fas fa-ice-cream fa-spin"></i><br>
+          Cargando ubicación...
+        </div>
+        <div id="mapa-contacto"></div>
+      </div>
+    </div>
+    
+    <div class="formulario-contacto">
+      <h2 class="formulario-titulo"><i class="fas fa-comment-dots"></i> Formulario de Quejas, Sugerencias y Consultas</h2>
+      <p class="formulario-descripcion">Completa el siguiente formulario para enviar tu queja, sugerencia o consulta. Nos comprometemos a responder en menos de 24 horas hábiles. Tu feedback nos ayuda a mejorar y crear experiencias más dulces para todos nuestros clientes.</p>
+      
+      <form id="formulario-contacto">
+        <div class="fila-formulario">
+          <div class="grupo-formulario">
+            <label for="nombre-contacto" class="label-formulario">
+              <i class="fas fa-user icono-helado"></i> Nombre Completo *
+            </label>
+            <input type="text" id="nombre-contacto" name="nombre" class="input-formulario" required placeholder="Ej: María González López">
+            <small class="texto-pequeno">Ingresa tu nombre completo (mínimo 3 caracteres)</small>
+          </div>
+          
+          <div class="grupo-formulario">
+            <label for="email-contacto" class="label-formulario">
+              <i class="fas fa-envelope icono-helado"></i> Correo Electrónico *
+            </label>
+            <input type="email" id="email-contacto" name="email" class="input-formulario" required placeholder="ejemplo@correo.com">
+            <small class="texto-pequeno">Asegúrate de escribir correctamente tu correo principal</small>
+          </div>
+        </div>
+        
+        <div class="fila-formulario">
+          <div class="grupo-formulario">
+            <label for="telefono-contacto" class="label-formulario">
+              <i class="fas fa-phone icono-helado"></i> Teléfono / WhatsApp *
+            </label>
+            <input type="tel" id="telefono-contacto" name="telefono" class="input-formulario" required placeholder="Ej: 55 1234 5678">
+            <small class="texto-pequeno">Nos contactaremos por este número si es necesario</small>
+          </div>
+          
+          <div class="grupo-formulario">
+            <label for="sucursal-contacto" class="label-formulario">
+              <i class="fas fa-store icono-helado"></i> Sucursal Visitada *
+            </label>
+            <select id="sucursal-contacto" name="sucursal" class="select-formulario" required>
+              <option value="">Selecciona una sucursal</option>
+              <option value="centro">Sucursal Centro - Calle Principal 123</option>
+              <option value="norte">Sucursal Norte - Av. Los Helados 456</option>
+              <option value="sur">Sucursal Sur - Plaza del Sabor 789</option>
+              <option value="online">Pedido Online / Delivery</option>
+              <option value="ninguna">No he visitado ninguna</option>
+            </select>
+            <small class="texto-pequeno">Ayúdanos a identificar dónde fue tu experiencia</small>
+          </div>
+        </div>
+        
+        <div class="fila-formulario">
+          <div class="grupo-formulario">
+            <label for="asunto-contacto" class="label-formulario">
+              <i class="fas fa-tag icono-helado"></i> Asunto Principal *
+            </label>
+            <select id="asunto-contacto" name="asunto" class="select-formulario" required>
+              <option value="">Selecciona un asunto</option>
+              <option value="queja">Queja sobre producto/servicio</option>
+              <option value="sugerencia">Sugerencia de nuevos sabores o servicios</option>
+              <option value="felicitacion">Felicitación al personal o servicio</option>
+              <option value="evento">Consulta para eventos especiales</option>
+              <option value="pedido">Problema con pedido a domicilio</option>
+              <option value="producto">Información sobre ingredientes/alergenos</option>
+              <option value="trabajo">Solicitud de empleo o prácticas</option>
+              <option value="franquicia">Información sobre franquicias</option>
+              <option value="otros">Otros temas</option>
+            </select>
+            <small class="texto-pequeno">Selecciona el motivo principal de tu contacto</small>
+          </div>
+          
+          <div class="grupo-formulario">
+            <label for="fecha-experiencia" class="label-formulario">
+              <i class="fas fa-calendar icono-helado"></i> Fecha de la Experiencia *
+            </label>
+            <input type="date" id="fecha-experiencia" name="fecha" class="input-formulario" max="" required>
+            <small class="texto-pequeno">Indica cuándo ocurrió tu visita o pedido</small>
+          </div>
+        </div>
+        
+        <div class="grupo-formulario">
+          <label class="label-formulario">
+            <i class="fas fa-ice-cream icono-helado"></i> Área o Producto Involucrado *
+          </label>
+          <div class="tipo-queja">
+            <input type="radio" id="tipo-sabor" name="tipo" value="sabor" class="tipo-queja-input" required>
+            <label for="tipo-sabor" class="tipo-queja-label">
+              <i class="fas fa-strawberry"></i> Sabor / Calidad del Helado
+            </label>
+            
+            <input type="radio" id="tipo-atencion" name="tipo" value="atencion" class="tipo-queja-input">
+            <label for="tipo-atencion" class="tipo-queja-label">
+              <i class="fas fa-user-tie"></i> Atención al Cliente
+            </label>
+            
+            <input type="radio" id="tipo-limpieza" name="tipo" value="limpieza" class="tipo-queja-input">
+            <label for="tipo-limpieza" class="tipo-queja-label">
+              <i class="fas fa-broom"></i> Limpieza / Ambiente del Local
+            </label>
+            
+            <input type="radio" id="tipo-pedido" name="tipo" value="pedido" class="tipo-queja-input">
+            <label for="tipo-pedido" class="tipo-queja-label">
+              <i class="fas fa-motorcycle"></i> Pedido a Domicilio / Delivery
+            </label>
+            
+            <input type="radio" id="tipo-sugerencia" name="tipo" value="sugerencia" class="tipo-queja-input">
+            <label for="tipo-sugerencia" class="tipo-queja-label">
+              <i class="fas fa-lightbulb"></i> Sugerencia Creativa / Nuevos Sabores
+            </label>
+            
+            <input type="radio" id="tipo-precios" name="tipo" value="precios" class="tipo-queja-input">
+            <label for="tipo-precios" class="tipo-queja-label">
+              <i class="fas fa-tag"></i> Precios / Promociones
+            </label>
+          </div>
+          <small class="texto-pequeno">Selecciona el área principal de tu comentario (obligatorio)</small>
+        </div>
+        
+        <div class="grupo-formulario">
+          <label for="descripcion-contacto" class="label-formulario">
+            <i class="fas fa-edit icono-helado"></i> Descripción Detallada *
+          </label>
+          <textarea id="descripcion-contacto" name="descripcion" class="textarea-formulario" rows="5" required placeholder="Describe tu experiencia, queja o sugerencia con el mayor detalle posible. Incluye información como: sabor probado, hora de visita, nombre del empleado (si aplica), qué esperabas vs qué recibiste, y cómo podemos mejorar."></textarea>
+          <small class="texto-pequeno">Mínimo 50 caracteres. Sé específico para que podamos ayudarte mejor.</small>
+        </div>
+        
+        <div class="fila-formulario">
+          <div class="grupo-formulario">
+            <label for="archivo-contacto" class="label-formulario">
+              <i class="fas fa-paperclip icono-helado"></i> Adjuntar Foto/Archivo (Opcional)
+            </label>
+            <input type="file" id="archivo-contacto" name="archivo" class="input-formulario archivo-input" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+            <small class="texto-pequeno">Fotos de tu helado, ticket de compra, factura (máx. 10MB)</small>
+          </div>
+          
+          <div class="grupo-formulario">
+            <label class="label-formulario">
+              <i class="fas fa-star icono-helado"></i> Calificación General *
+            </label>
+            <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+              <label style="cursor: pointer;">
+                <input type="radio" name="calificacion" value="1" class="tipo-queja-input" required>
+                <span style="font-size: 22px; color: #ffcc00;">★</span> Mala
+              </label>
+              <label style="cursor: pointer;">
+                <input type="radio" name="calificacion" value="2" class="tipo-queja-input">
+                <span style="font-size: 22px; color: #ffcc00;">★★</span> Regular
+              </label>
+              <label style="cursor: pointer;">
+                <input type="radio" name="calificacion" value="3" class="tipo-queja-input">
+                <span style="font-size: 22px; color: #ffcc00;">★★★</span> Buena
+              </label>
+              <label style="cursor: pointer;">
+                <input type="radio" name="calificacion" value="4" class="tipo-queja-input">
+                <span style="font-size: 22px; color: #ffcc00;">★★★★</span> Muy Buena
+              </label>
+              <label style="cursor: pointer;">
+                <input type="radio" name="calificacion" value="5" class="tipo-queja-input">
+                <span style="font-size: 22px; color: #ffcc00;">★★★★★</span> Excelente
+              </label>
+            </div>
+            <small class="texto-pequeno">Del 1 (muy insatisfecho) al 5 (excelente experiencia) - Obligatorio</small>
+          </div>
+        </div>
+        
+        <button type="submit" class="boton-enviar-contacto">
+          <i class="fas fa-paper-plane"></i> Enviar Comentario
+        </button>
+        
+        <div id="mensaje-confirmacion" class="mensaje-confirmacion">
+          <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i> 
+          <h3 style="margin: 10px 0;">¡Gracias por tu comentario!</h3>
+          <p>Tu mensaje ha sido enviado correctamente. Te contactaremos en menos de 24 horas hábiles al correo proporcionado. Como agradecimiento por ayudarnos a mejorar, te obsequiamos un <strong>15% de descuento</strong> en tu próxima visita (código: <strong>FRÍO15</strong>). También hemos registrado tus preferencias para ofrecerte experiencias más personalizadas. ¡Esperamos verte pronto en Frio Fantasy!</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- WhatsApp Button -->
+  <a 
+    href="https://wa.me/525512345678?text=Hola%20Frio%20Fantasy,%20me%20interesa%20más%20información%20sobre%20sus%20productos%20y%20servicios"
+    class="whatsapp-btn whatsapp-pulse" 
+    target="_blank"
+    aria-label="Contactar por WhatsApp"
+  >
+    <i class="fab fa-whatsapp"></i>
+    <span class="whatsapp-tooltip">¡Chatea con nosotros!</span>
+  </a>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <img src="logo.png" alt="Frio Fantasy"/>
+          </div>
+          <p>El mejor helado artesanal de la ciudad. Elaborado con ingredientes 100% naturales, frutas frescas de temporada y pasión desde 2010. Nuestro compromiso es endulzar tus momentos especiales con calidad y creatividad.</p>
+          <div class="social-links">
+            <a href="https://facebook.com/friofantasy" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://instagram.com/friofantasy" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="https://twitter.com/friofantasy" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="https://tiktok.com/@friofantasy" class="social-link"><i class="fab fa-tiktok"></i></a>
+            <a href="https://youtube.com/friofantasy" class="social-link"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Enlaces Rápidos</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="index.html#about">Nuestra Historia</a></li>
+            <li><a href="index.html#products">Nuestro Menú Completo</a></li>
+            <li><a href="index.html#testimonials">Testimonios de Clientes</a></li>
+            <li><a href="contacto.html">Contacto y Soporte</a></li>
+            <li><a href="index.html#galeria">Galería de Productos</a></li>
+            <li><a href="promociones.html">Promociones Actuales</a></li>
+            <li><a href="eventos.html">Eventos Especiales</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Categorías de Productos</h4>
+          <ul class="footer-links">
+            <li><a href="menu.html#cremosos">Helados Cremosos Artesanales</a></li>
+            <li><a href="menu.html#frutales">Helados Frutales Naturales</a></li>
+            <li><a href="menu.html#especiales">Especialidades de Temporada</a></li>
+            <li><a href="menu.html#clasicos">Clásicos Reconfortantes</a></li>
+            <li><a href="menu.html#saludables">Opciones Saludables y Sin Azúcar</a></li>
+            <li><a href="menu.html#postres">Postres y Complementos</a></li>
+            <li><a href="menu.html#batidos">Batidos y Malteadas</a></li>
+            <li><a href="menu.html#nieves">Nieves Tradicionales</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Boletín Informativo</h4>
+          <p>Suscríbete para recibir ofertas exclusivas, nuevos sabores de temporada, eventos especiales y descuentos solo para suscriptores. Sé el primero en conocer nuestras novedades.</p>
+          <form class="newsletter-form" id="newsletterForm">
+            <input type="email" placeholder="Tu Correo Electrónico" required>
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+          </form>
+          <div class="contact-info" style="margin-top: 20px;">
+            <p><i class="fas fa-map-marker-alt" style="margin-right: 10px;"></i> Av. Los Helados 456, Col. Centro, Ciudad Azucarada, CP 12345</p>
+            <p><i class="fas fa-phone" style="margin-right: 10px;"></i> Tel: (55) 1234-5678 | WhatsApp: (55) 9999-8888</p>
+            <p><i class="fas fa-envelope" style="margin-right: 10px;"></i> contacto@friofantasy.com</p>
+            <p><i class="fas fa-clock" style="margin-right: 10px;"></i> Lunes a Domingos: 11:00 AM - 10:00 PM</p>
+            <p><i class="fas fa-shipping-fast" style="margin-right: 10px;"></i> Delivery: Todos los días hasta las 10:30 PM</p>
+          </div>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 Frio Fantasy Heladería Artesanal. Todos los derechos reservados. | <a href="privacidad.html" style="color: var(--primary);">Política de Privacidad</a> | <a href="terminos.html" style="color: var(--primary);">Términos de Servicio</a> | <a href="cookies.html" style="color: var(--primary);">Política de Cookies</a></p>
+        <p style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">Este sitio web es propiedad de Frio Fantasy S.A. de C.V. Los precios y promociones pueden cambiar sin previo aviso. Producto 100% mexicano. Hecho con ❤️ y 🍦 en México.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Mobile Menu Toggle
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+    
+    // Configurar fecha máxima para el campo de fecha (hoy)
+    document.getElementById('fecha-experiencia').max = new Date().toISOString().split("T")[0];
+    document.getElementById('fecha-experiencia').value = new Date().toISOString().split("T")[0];
+    
+    // Inicializar mapa
+    let mapaContacto;
+    
+    function inicializarMapa() {
+      // Remover mensaje de carga
+      document.getElementById('mapaCargando').style.display = 'none';
+      
+      // Coordenadas de Ciudad de México (Zócalo)
+      mapaContacto = L.map('mapa-contacto', {
+        center: [19.4326, -99.1332],
+        zoom: 16,
+        zoomControl: true,
+        scrollWheelZoom: true,
+        attributionControl: true
+      });
+      
+      // TileLayer de OpenStreetMap
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+      }).addTo(mapaContacto);
+      
+      // Marcador principal personalizado
+      const iconoHeladeria = L.divIcon({
+        html: '<div style="background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%); color: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 3px solid white; box-shadow: 0 0 15px rgba(233, 30, 99, 0.5);"><i class="fas fa-ice-cream"></i></div>',
+        iconSize: [55, 55],
+        iconAnchor: [27, 55],
+        popupAnchor: [0, -55]
+      });
+      
+      // Sucursal Principal
+      L.marker([19.4326, -99.1332], {icon: iconoHeladeria}).addTo(mapaContacto)
+        .bindPopup(`
+          <div style="padding: 10px; min-width: 250px;">
+            <h3 style="margin: 0 0 10px 0; color: #e91e63;"><i class="fas fa-ice-cream"></i> Frio Fantasy Heladería</h3>
+            <p style="margin: 0 0 8px 0;"><strong>🏠 Sucursal Centro</strong></p>
+            <p style="margin: 0 0 6px 0;"><i class="fas fa-map-marker-alt"></i> Av. Los Helados 456, Centro</p>
+            <p style="margin: 0 0 6px 0;"><i class="fas fa-clock"></i> 11:00 AM - 10:00 PM</p>
+            <p style="margin: 0 0 6px 0;"><i class="fas fa-phone"></i> (55) 1234-5678</p>
+            <p style="margin: 0 0 6px 0;"><i class="fas fa-wifi"></i> Wi-Fi Gratis</p>
+            <p style="margin: 0;"><i class="fas fa-car"></i> Estacionamiento disponible</p>
+          </div>
+        `)
+        .openPopup();
+      
+      // Sucursal Norte
+      L.marker([19.4420, -99.1400]).addTo(mapaContacto)
+        .bindPopup(`
+          <div style="padding: 8px;">
+            <h4 style="margin: 0 0 8px 0; color: #e91e63;"><i class="fas fa-store"></i> Sucursal Norte</h4>
+            <p style="margin: 0 0 5px 0;"><strong>Dirección:</strong> Calle Principal 123</p>
+            <p style="margin: 0 0 5px 0;"><strong>Horario:</strong> 10:00 AM - 11:00 PM</p>
+            <p style="margin: 0;"><strong>Especial:</strong> Helados de temporada</p>
+          </div>
+        `);
+      
+      // Sucursal Sur
+      L.marker([19.4230, -99.1260]).addTo(mapaContacto)
+        .bindPopup(`
+          <div style="padding: 8px;">
+            <h4 style="margin: 0 0 8px 0; color: #e91e63;"><i class="fas fa-store"></i> Sucursal Sur</h4>
+            <p style="margin: 0 0 5px 0;"><strong>Dirección:</strong> Plaza del Sabor 789</p>
+            <p style="margin: 0 0 5px 0;"><strong>Horario:</strong> 12:00 PM - 9:00 PM</p>
+            <p style="margin: 0;"><strong>Especial:</strong> Opciones sin azúcar</p>
+          </div>
+        `);
+      
+      // Puntos de interés
+      L.marker([19.4340, -99.1300]).addTo(mapaContacto)
+        .bindPopup('<strong>🌳 Parque Central</strong><br>Área verde para disfrutar tu helado');
+        
+      L.marker([19.4310, -99.1360]).addTo(mapaContacto)
+        .bindPopup('<strong>🛍️ Centro Comercial</strong><br>Zona comercial con múltiples tiendas');
+      
+      // Área de delivery
+      L.circle([19.4326, -99.1332], {
+        color: '#e91e63',
+        fillColor: '#e91e63',
+        fillOpacity: 0.1,
+        radius: 800
+      }).addTo(mapaContacto)
+        .bindPopup('<strong>🚚 Área de Delivery Gratis</strong><br>Envío sin costo en esta zona');
+      
+      // Ajustar mapa después de cargar
+      setTimeout(() => {
+        if (mapaContacto) {
+          mapaContacto.invalidateSize();
+        }
+      }, 300);
+    }
+    
+    // Inicializar mapa después de cargar la página
+    window.addEventListener('load', () => {
+      setTimeout(inicializarMapa, 100);
+    });
+    
+    // Redimensionar mapa al cambiar tamaño de ventana
+    window.addEventListener('resize', () => {
+      if (mapaContacto) {
+        setTimeout(() => {
+          mapaContacto.invalidateSize();
+        }, 200);
+      }
+    });
+    
+    // Manejo del formulario
+    const formulario = document.getElementById('formulario-contacto');
+    const botonEnviar = document.querySelector('.boton-enviar-contacto');
+    
+    // Validación en tiempo real
+    function validarFormulario() {
+      const nombre = document.getElementById('nombre-contacto').value.trim();
+      const email = document.getElementById('email-contacto').value.trim();
+      const telefono = document.getElementById('telefono-contacto').value.trim();
+      const sucursal = document.getElementById('sucursal-contacto').value;
+      const asunto = document.getElementById('asunto-contacto').value;
+      const fecha = document.getElementById('fecha-experiencia').value;
+      const descripcion = document.getElementById('descripcion-contacto').value.trim();
+      const tipoSeleccionado = formulario.querySelector('input[name="tipo"]:checked');
+      const calificacionSeleccionada = formulario.querySelector('input[name="calificacion"]:checked');
+      
+      const nombreValido = nombre.length >= 3;
+      const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const telefonoValido = telefono.length >= 8;
+      const sucursalValida = sucursal !== '';
+      const asuntoValido = asunto !== '';
+      const fechaValida = fecha !== '';
+      const descripcionValida = descripcion.length >= 50;
+      const tipoValido = tipoSeleccionado !== null;
+      const calificacionValida = calificacionSeleccionada !== null;
+      
+      const todosValidos = nombreValido && emailValido && telefonoValido && 
+                          sucursalValida && asuntoValido && fechaValida && 
+                          descripcionValida && tipoValido && calificacionValida;
+      
+      // Actualizar estado del botón
+      botonEnviar.disabled = !todosValidos;
+      botonEnviar.style.opacity = todosValidos ? '1' : '0.7';
+      botonEnviar.style.cursor = todosValidos ? 'pointer' : 'not-allowed';
+      
+      return todosValidos;
+    }
+    
+    // Escuchar cambios en los campos
+    const camposValidacion = [
+      'nombre-contacto', 'email-contacto', 'telefono-contacto', 
+      'sucursal-contacto', 'asunto-contacto', 'fecha-experiencia', 
+      'descripcion-contacto'
+    ];
+    
+    camposValidacion.forEach(id => {
+      document.getElementById(id).addEventListener('input', validarFormulario);
+    });
+    
+    // Escuchar cambios en radio buttons
+    formulario.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', validarFormulario);
+    });
+    
+    // Envío del formulario
+    formulario.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!validarFormulario()) {
+        alert('Por favor completa todos los campos obligatorios correctamente.');
+        return;
+      }
+      
+      // Mostrar mensaje de confirmación
+      const mensajeConfirmacion = document.getElementById('mensaje-confirmacion');
+      mensajeConfirmacion.style.display = 'block';
+      
+      // Scroll suave al mensaje
+      mensajeConfirmacion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Cambiar estado del botón
+      const textoOriginal = botonEnviar.innerHTML;
+      botonEnviar.innerHTML = '<i class="fas fa-check"></i> ¡Enviado Exitosamente!';
+      botonEnviar.style.background = 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)';
+      botonEnviar.disabled = true;
+      
+      // Recopilar datos del formulario
+      const formData = {
+        nombre: document.getElementById('nombre-contacto').value,
+        email: document.getElementById('email-contacto').value,
+        telefono: document.getElementById('telefono-contacto').value,
+        sucursal: document.getElementById('sucursal-contacto').value,
+        asunto: document.getElementById('asunto-contacto').value,
+        fecha: document.getElementById('fecha-experiencia').value,
+        tipo: formulario.querySelector('input[name="tipo"]:checked').value,
+        descripcion: document.getElementById('descripcion-contacto').value,
+        calificacion: formulario.querySelector('input[name="calificacion"]:checked').value,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('Formulario enviado:', formData);
+      
+      // Resetear después de 5 segundos
+      setTimeout(() => {
+        formulario.reset();
+        mensajeConfirmacion.style.display = 'none';
+        botonEnviar.innerHTML = textoOriginal;
+        botonEnviar.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
+        validarFormulario(); // Revalidar estado
+      }, 5000);
+    });
+    
+    // Newsletter Form
+    document.getElementById('newsletterForm')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = this.querySelector('input[type="email"]').value;
+      alert(`¡Gracias por suscribirte con el correo: ${email}! Te enviaremos nuestras promociones pronto.`);
+      this.reset();
+    });
+    
+    // Inicializar validación
+    validarFormulario();
+  </script>
+</body>
+</html>

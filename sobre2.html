@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre Nosotros</title>
+  <style>
+    :root {
+      --rojo-principal: #b11226;
+      --rojo-oscuro: #7a0c19;
+      --rojo-claro: #f8d7da;
+      --gris-texto: #444;
+      --fondo: #fff5f6;
+    }* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--fondo);
+  color: var(--gris-texto);
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(135deg, var(--rojo-principal), var(--rojo-oscuro));
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+header p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  opacity: 0.95;
+}
+
+section {
+  padding: 4rem 2rem;
+  max-width: 1100px;
+  margin: auto;
+}
+
+section h2 {
+  color: var(--rojo-principal);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  border-left: 6px solid var(--rojo-principal);
+  padding-left: 1rem;
+}
+
+.bloques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.bloque {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  border-top: 5px solid var(--rojo-principal);
+}
+
+.bloque h3 {
+  margin-bottom: 1rem;
+  color: var(--rojo-oscuro);
+}
+
+.cta {
+  background-color: var(--rojo-principal);
+  color: white;
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.cta h2 {
+  color: white;
+  border: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.cta p {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.cta a {
+  background: white;
+  color: var(--rojo-principal);
+  padding: 0.8rem 2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cta a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+footer {
+  background-color: var(--rojo-oscuro);
+  color: #eee;
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+}
+
+  </style>
+</head>
+<body>  <header>
+    <h1>Sobre Nosotros</h1>
+    <p>Pasión, compromiso y excelencia. Somos una empresa impulsada por valores sólidos y una visión clara hacia el futuro.</p>
+  </header>  <section>
+    <h2>Quiénes Somos</h2>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2.5rem; align-items:center; margin-bottom:3rem;">
+      <div>
+        <p>
+          Somos una organización con una larga trayectoria en nuestro sector. Nos caracterizamos por nuestra
+          dedicación, profesionalismo y un enfoque centrado en el buen servicio a las personas. Creemos en hacer las cosas bien, con pasión
+          y atención al detalle.
+        </p>
+      </div>
+      <div style="text-align:center;">
+        <img src="ñ.jpg" alt="Nuestros fundadores" style="max-width:100%; border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,0.2); border:6px solid #b11226;" />
+        <p style="margin-top:0.8rem; font-size:0.95rem; color:#666;">Nuestros líderes y fundadores</p>
+      </div>
+    </div><div class="bloques">
+  <div class="bloque">
+    <h3>Nuestra Misión</h3>
+    <p>
+      Ofrecer helados de alta calidad que generen satisfaccion, confort y alegria para nuestros clientes.
+    </p>
+  </div>
+  <div class="bloque">
+    <h3>Nuestra Visión</h3>
+    <p>
+      Ser referentes en nuestro sector, reconocidos por nuestra innovación, ética y compromiso constante.
+    </p>
+  </div>
+  <div class="bloque">
+    <h3>Nuestros Valores</h3>
+    <p>
+      Transparencia, responsabilidad, trabajo en equipo y una pasión inquebrantable por la excelencia.
+    </p>
+  </div>
+</div>
+
+  </section>  <section class="cta">
+    <h2>la experiencia mas refrescante</h2>
+    <p>Estamos listos para tu llegada, bienvenido a la mejor heladeria de bani.</p>
+    <a href="#">Contáctanos</a>
+  </section>  <footer>
+    © 2026 Tu Empresa. Todos los derechos reservados.
+  </footer></body>
+</html>

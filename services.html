@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicio al Cliente - Frio Fantasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e91e63;
+            --primary-dark: #c2185b;
+            --secondary: #ff9800;
+            --light: #fff5f8;
+            --dark: #333;
+            --gray: #666;
+            --light-gray: #f5f5f5;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --border-radius: 15px;
+            --box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffebee 0%, #ffe0b2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: var(--box-shadow);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .back-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(233, 30, 99, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* AI Info Card */
+        .ai-info-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            height: fit-content;
+        }
+
+        .ai-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .ai-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-avatar::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .ai-header h2 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .ai-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--light);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .ai-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .ai-capabilities {
+            margin-top: 25px;
+        }
+
+        .capabilities-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .capabilities-title i {
+            color: var(--secondary);
+        }
+
+        .capabilities-list {
+            list-style: none;
+        }
+
+        .capabilities-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .capabilities-list li:last-child {
+            border-bottom: none;
+        }
+
+        .capabilities-list i {
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .chat-type-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-type-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .chat-type-btn.active {
+            background: white;
+            color: var(--primary);
+        }
+
+        .chat-type-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--light);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Message Bubbles */
+        .message {
+            display: flex;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message-content {
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: var(--dark);
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--light-gray);
+            border-radius: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .send-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 20px;
+            background: var(--light);
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .quick-action-btn {
+            background: white;
+            border: 1px solid var(--light-gray);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Rating System */
+        .rating-container {
+            padding: 20px;
+            background: var(--light);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .rating-title {
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .star {
+            font-size: 1.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .star.active {
+            color: var(--secondary);
+        }
+
+        .star:hover {
+            color: var(--secondary);
+            transform: scale(1.2);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .contact-item i {
+            color: var(--primary);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing 1.5s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Sentiment Indicators */
+        .sentiment {
+            font-size: 1.2rem;
+            margin-left: 10px;
+        }
+
+        .sentiment.positive {
+            color: var(--success);
+        }
+
+        .sentiment.neutral {
+            color: var(--warning);
+        }
+
+        .sentiment.negative {
+            color: var(--error);
+        }
+
+        /* Satisfaction Meter */
+        .satisfaction-meter {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .meter-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .meter-bar {
+            height: 10px;
+            background: var(--light-gray);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error), var(--warning), var(--success));
+            width: 85%;
+            transition: width 1s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .ai-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-container {
+                height: 500px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+
+        /* Scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--light-gray);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <img src="logo.png" alt="Frio Fantasy">
+                <div>
+                    <h1>Servicio al Cliente <span>Frio Fantasy</span></h1>
+                    <p>Asistente Virtual Inteligente</p>
+                </div>
+            </div>
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+                Volver al Inicio
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- AI Info Card -->
+            <div class="ai-info-card">
+                <div class="ai-header">
+                    <div class="ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h2>Heladia AI</h2>
+                    <div class="ai-status">
+                        <div class="status-dot"></div>
+                        <span>En línea - Lista para ayudar</span>
+                    </div>
+                </div>
+
+                <div class="ai-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="resolvedCount">1,247</div>
+                        <div class="stat-label">Casos Resueltos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="satisfactionRate">94%</div>
+                        <div class="stat-label">Satisfacción</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="responseTime">2.3s</div>
+                        <div class="stat-label">Tiempo Respuesta</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="activeChats">12</div>
+                        <div class="stat-label">Chats Activos</div>
+                    </div>
+                </div>
+
+                <!-- Satisfaction Meter -->
+                <div class="satisfaction-meter">
+                    <div class="meter-header">
+                        <span>Nivel de Satisfacción</span>
+                        <span id="satisfactionPercent">85%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="meterFill"></div>
+                    </div>
+                </div>
+
+                <div class="ai-capabilities">
+                    <h3 class="capabilities-title">
+                        <i class="fas fa-brain"></i>
+                        ¿Qué puedo hacer por ti?
+                    </h3>
+                    <ul class="capabilities-list">
+                        <li><i class="fas fa-check-circle"></i> Atender quejas y reclamos</li>
+                        <li><i class="fas fa-check-circle"></i> Tomar pedidos especiales</li>
+                        <li><i class="fas fa-check-circle"></i> Sugerir nuevos sabores</li>
+                        <li><i class="fas fa-check-circle"></i> Informar sobre promociones</li>
+                        <li><i class="fas fa-check-circle"></i> Ayudar con seguimiento de pedidos</li>
+                        <li><i class="fas fa-check-circle"></i> Recibir feedback y sugerencias</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>Chat con Heladia AI</h2>
+                    <div class="chat-type-selector">
+                        <button class="chat-type-btn active" onclick="setChatType('general')">General</button>
+                        <button class="chat-type-btn" onclick="setChatType('complaint')">Queja</button>
+                        <button class="chat-type-btn" onclick="setChatType('order')">Pedido</button>
+                        <button class="chat-type-btn" onclick="setChatType('suggestion')">Sugerencia</button>
+                    </div>
+                </div>
+
+
+    <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Initial bot message -->
+                    <div class="message bot">
+                        <div class="bot-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <div class="message-content">
+                                ¡Hola! Soy Heladia, tu asistente virtual de Frio Fantasy. 😊<br><br>
+                                Estoy aquí para ayudarte con:<br>
+                                • Quejas y reclamos<br>
+                                • Pedidos especiales<br>
+                                • Sugerencias de sabores<br>
+                                • Información sobre promociones<br><br>
+                                ¿En qué puedo ayudarte hoy?
+                            </div>
+                            <div class="message-time" id="initialTime"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions" id="quickActions">
+                    <button class="quick-action-btn" onclick="quickMessage('Tengo un problema con mi pedido')">
+                        <i class="fas fa-exclamation-triangle"></i> Problema con pedido
+                    </button>
+                    <button class="quick-action-btn" onclick="quickMessage('Quiero hacer un pedido especial')">
+                        <i class="fas fa-ice-cream"></i> Pedido especial
+                    </button>
+                    <button class="quick-action-btn" onclick="quickMessage('Tengo una sugerencia de sabor')">
+                        <i class="fas fa-lightbulb"></i> Sugerencia de sabor
+                    </button>
+                    <button class="quick-action-btn" onclick="quickMessage('¿Qué promociones tienen?')">
+                        <i class="fas fa-tag"></i> Ver promociones
+                    </button>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <input type="text" 
+                           class="chat-input" 
+                           id="chatInput" 
+                           placeholder="Escribe tu mensaje aquí..."
+                           onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Frio Fantasy - Servicio al Cliente Inteligente</p>
+            <p>Nuestra IA está en constante aprendizaje para servirte mejor</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Soporte: (123) 456-7890</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>soporte@friofantasy.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>24/7 Disponible</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script>
+        // Base de conocimiento de la IA
+        const knowledgeBase = {
+            greetings: [
+                "¡Hola! 😊 ¿En qué puedo ayudarte hoy?",
+                "¡Buen día! 🌟 Estoy aquí para asistirte. ¿Cómo estás?",
+                "¡Hola! 👋 Soy Heladia, tu asistente virtual de Frio Fantasy. ¿En qué te puedo ayudar?",
+                "¡Saludos! 🍦 Bienvenido al servicio al cliente de Frio Fantasy. ¿Cómo puedo asistirte?"
+            ],
+            
+            complaints: {
+                "pedido": {
+                    patterns: ["pedido", "entrega", "envío", "llegó", "recibí", "demora"],
+                    responses: [
+                        "Entiendo tu preocupación con el pedido. Por favor, proporciona tu número de orden para revisar el estado.",
+                        "Lamento escuchar sobre el problema con tu pedido. ¿Podrías darme más detalles?",
+                        "Para ayudarte mejor con tu pedido, necesito el número de orden y la fecha del pedido.",
+                        "Los retrasos en entregas pueden ser frustrantes. Verificaré tu caso inmediatamente."
+                    ],
+                    followUp: "¿Tienes el número de orden a mano?",
+                    action: "Registrar queja de pedido"
+                },
+                "calidad": {
+                    patterns: ["calidad", "sabor", "textura", "derretido", "congelado", "mal estado"],
+                    responses: [
+                        "Lamento mucho que la calidad no haya sido la esperada. ¿Podrías describir qué pasó exactamente?",
+                        "En Frio Fantasy nos tomamos muy en serio la calidad. Investigaré este asunto personalmente.",
+                        "¿Podrías contarme qué sabor o producto específico tuvo problemas de calidad?",
+                        "Tu feedback es importante para mejorar. Documentaré este incidente para el equipo de calidad."
+                    ],
+                    followUp: "¿Podrías especificar qué producto y sabor tuvo el problema?",
+                    action: "Registrar queja de calidad"
+                },
+                "servicio": {
+                    patterns: ["servicio", "atencion", "empleado", "personal", "trato", "educado"],
+                    responses: [
+                        "Lamento escuchar sobre tu experiencia con nuestro servicio. ¿Podrías contarme más detalles?",
+                        "El buen servicio es nuestra prioridad. Investigaré esta situación inmediatamente.",
+                        "¿En qué sucursal o con qué empleado tuviste esta experiencia?",
+                        "Tomaré medidas correctivas basadas en tu feedback. Gracias por reportarlo."
+                    ],
+                    followUp: "¿Podrías decirme en qué sucursal y aproximadamente a qué hora fue?",
+                    action: "Registrar queja de servicio"
+                },
+                "precio": {
+                    patterns: ["precio", "costo", "caro", "barato", "tarifa", "cobro"],
+                    responses: [
+                        "Entiendo tu preocupación sobre los precios. Nuestros precios reflejan ingredientes premium.",
+                        "¿Podrías especificar qué producto consideras que tiene un precio inadecuado?",
+                        "Ofrecemos varias promociones que pueden hacer nuestros productos más accesibles.",
+                        "Revisaré nuestros precios para esa categoría y te daré información detallada."
+                    ],
+                    followUp: "¿Qué producto específico te parece que tiene un precio inadecuado?",
+                    action: "Registrar consulta de precio"
+                }
+            },
+            
+            orders: {
+                "especial": {
+                    patterns: ["especial", "personalizado", "crear", "nuevo", "único", "diferente"],
+                    responses: [
+                        "¡Me encanta la creatividad! 🎨 ¿Qué tipo de helado especial tienes en mente?",
+                        "Podemos crear un helado único para ti. ¿Qué sabores te gustaría combinar?",
+                        "Para helados personalizados necesitamos 24 horas de anticipación. ¿Para cuándo lo necesitas?",
+                        "Contamos con más de 20 sabores base y 15 toppings. ¿Qué te gustaría incluir?"
+                    ],
+                    followUp: "¿Tienes alguna combinación específica en mente?",
+                    action: "Iniciar pedido especial"
+                },
+                "grande": {
+                    patterns: ["grande", "fiesta", "evento", "cantidad", "varios", "muchos"],
+                    responses: [
+                        "¡Perfecto para celebraciones! 🎉 ¿Para cuántas personas será el evento?",
+                        "Para pedidos grandes ofrecemos descuentos especiales. ¿Qué cantidad aproximada necesitas?",
+                        "Necesitamos 48 horas de anticipación para pedidos grandes. ¿Para qué fecha lo requieres?",
+                        "Tenemos opciones de catering con heladeras portátiles. ¿Te interesaría ese servicio?"
+                    ],
+                    followUp: "¿Para cuántas personas será y para qué fecha?",
+                    action: "Cotizar pedido grande"
+                },
+                "entrega": {
+                    patterns: ["domicilio", "entrega", "envío", "llevar", "traer", "recibir"],
+                    responses: [
+                        "¡Claro que hacemos entregas! 🚚 ¿Cuál es tu dirección completa?",
+                        "El costo de envío depende de tu ubicación. ¿En qué zona vives?",
+                        "Entregamos en un radio de 15km. ¿Podrías proporcionar tu dirección?",
+                        "El tiempo estimado de entrega es de 45-60 minutos. ¿A qué dirección debemos llevar tu pedido?"
+                    ],
+                    followUp: "¿Cuál es tu dirección completa para calcular el envío?",
+                    action: "Procesar entrega"
+                }
+            },
+            
+            suggestions: {
+                "sabor": {
+                    patterns: ["sabor", "nuevo", "crear", "sugerir", "idea", "propuesta"],
+                    responses: [
+                        "¡Nos encantan las ideas nuevas! 🍦 ¿Qué tipo de sabor te gustaría sugerir?",
+                        "Cada mes evaluamos nuevas sugerencias de sabores. ¿Podrías describir tu idea?",
+                        "¿Es un sabor frutal, cremoso, con chocolate o algo completamente diferente?",
+                        "Las mejores sugerencias entran a nuestro concurso mensual. ¡Podrías ganar helado gratis!"
+                    ],
+                    followUp: "¿Podrías describir el sabor que tienes en mente?",
+                    action: "Registrar sugerencia de sabor"
+                },
+                "servicio": {
+                    patterns: ["mejorar", "cambiar", "sugerencia", "idea", "propuesta", "recomendación"],
+                    responses: [
+                        "Valoramos mucho tus ideas para mejorar. ¿Qué área crees que podríamos mejorar?",
+                        "Todas las sugerencias son revisadas por nuestro equipo directivo. ¿Cuál es tu propuesta?",
+                        "¿Es sobre el servicio, los productos, la tienda física o nuestra página web?",
+                        "Tu feedback nos ayuda a crecer. Documentaré tu sugerencia para el equipo correspondiente."
+                    ],
+                    followUp: "¿Podrías detallar un poco más tu sugerencia?",
+                    action: "Registrar sugerencia de mejora"
+                },
+                "promocion": {
+                    patterns: ["promoción", "oferta", "descuento", "cupón", "especial", "paquete"],
+                    responses: [
+                        "¡Excelente idea! 💡 ¿Qué tipo de promoción te gustaría ver?",
+                        "Actualmente tenemos promociones por compras grandes y para cumpleaños. ¿Buscas algo específico?",
+                        "¿Te refieres a promociones para estudiantes, familias o eventos especiales?",
+                        "Compartiré tu sugerencia con el equipo de marketing. ¿Podrías describir tu idea?"
+                    ],
+                    followUp: "¿Para qué tipo de cliente sería esta promoción?",
+                    action: "Registrar sugerencia de promoción"
+                }
+            },
+            
+            farewells: [
+                "¡Ha sido un placer ayudarte! 🍦 ¡Vuelve pronto a Frio Fantasy!",
+                "Gracias por contactarnos. ¡Esperamos verte pronto disfrutando de nuestros helados! 😊",
+                "Que tengas un día dulce y lleno de alegría. ¡Hasta la próxima! 🌟",
+                "Nos vemos pronto. ¡Recuerda que siempre hay un helado esperándote en Frio Fantasy! 👋"
+            ],
+            
+            positiveResponses: [
+                "¡Excelente! Me alegra escuchar eso. 😊",
+                "¡Qué bueno! Seguiremos trabajando para superar tus expectativas. 🌟",
+                "¡Fantástico! Tu satisfacción es nuestra mayor recompensa. 🍦",
+                "¡Maravilloso! Nos encanta saber que estás contento. 😄"
+            ],
+            
+            defaultResponses: [
+                "Interesante. ¿Podrías darme más detalles para ayudarte mejor?",
+                "Entiendo. Para asistirte de la mejor manera, ¿podrías ser más específico?",
+                "Gracias por compartir. ¿Hay algo más en lo que pueda ayudarte?",
+                "Tomaré nota de eso. ¿Hay algún otro aspecto en el que necesites asistencia?"
+            ]
+        };
+
+        // Variables globales
+        let chatType = 'general';
+        let userSentiment = 'neutral';
+        let conversationHistory = [];
+        let satisfactionLevel = 85;
+        let isTyping = false;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Establecer hora inicial
+            const now = new Date();
+            document.getElementById('initialTime').textContent = 
+                `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            // Actualizar estadísticas
+            updateStats();
+            
+            // Actualizar barra de satisfacción
+            updateSatisfactionMeter();
+            
+            // Focus en el input
+            document.getElementById('chatInput').focus();
+        });
+
+        // Función para volver al inicio
+        function goBack() {
+            if (conversationHistory.length > 0) {
+                if (confirm('¿Estás seguro de que quieres salir? Se perderá el historial de la conversación.')) {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Establecer tipo de chat
+        function setChatType(type) {
+            chatType = type;
+            
+            // Actualizar botones
+            document.querySelectorAll('.chat-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Mensaje de contexto
+            addBotMessage(`He cambiado el modo a: ${getChatTypeName(type)}. ¿En qué puedo ayudarte específicamente?`);
+        }
+
+        function getChatTypeName(type) {
+            const names = {
+                'general': 'Chat General',
+                'complaint': 'Quejas y Reclamos',
+                'order': 'Pedidos Especiales',
+                'suggestion': 'Sugerencias'
+            };
+            return names[type] || 'Chat General';
+        }
+
+        // Enviar mensaje
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message === '' || isTyping) return;
+            
+            // Agregar mensaje del usuario
+            addUserMessage(message);
+            input.value = '';
+            
+            // Procesar después de un breve delay
+            setTimeout(() => processUserMessage(message), 500);
+        }
+
+        // Manejar tecla Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Mensaje rápido
+        function quickMessage(text) {
+            document.getElementById('chatInput').value = text;
+            sendMessage();
+        }
+
+        // Agregar mensaje del usuario
+        function addUserMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const now = new Date();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${text}
+                    <span class="message-time">
+                        ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}
+                    </span>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Agregar al historial
+            conversationHistory.push({
+                type: 'user',
+                text: text,
+                time: now
+            });
+        }
+        
+              // Actualizar estadísticas basadas en el sentimiento
+            updateStatsBasedOnSentiment(sentiment);
+        }
+
+        // Mostrar indicador de escritura
+        function showTypingIndicator() {
+            if (isTyping) return;
+            
+            isTyping = true;
+            const chatMessages = document.getElementById('chatMessages');
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="bot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Ocultar indicador de escritura
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+            isTyping = false;
+        }
+
+        // Procesar mensaje del usuario
+        function processUserMessage(message) {
+            showTypingIndicator();
+            
+            // Simular tiempo de procesamiento
+            const processingTime = Math.random() * 1000 + 800;
+            
+            setTimeout(() => {
+                hideTypingIndicator();
+                
+                // Analizar el mensaje
+                const response = generateResponse(message.toLowerCase());
+                
+                // Determinar sentimiento de la respuesta
+                let sentiment = 'neutral';
+                if (response.includes('😊') || response.includes('🌟') || response.includes('🎉')) {
+                    sentiment = 'positive';
+                } else if (response.includes('😢') || response.includes('😔') || response.includes('⚠️')) {
+                    sentiment = 'negative';
+                }
+                
+                // Enviar respuesta
+                addBotMessage(response, sentiment);
+                
+                // Actualizar sentimiento del usuario
+                updateUserSentiment(message);
+                
+            }, processingTime);
+        }
+
+        // Generar respuesta basada en el mensaje
+        function generateResponse(message) {
+            // Detectar saludos
+            if (isGreeting(message)) {
+                return getRandomResponse(knowledgeBase.greetings);
+            }
+            
+            // Detectar despedidas
+            if (isFarewell(message)) {
+                return getRandomResponse(knowledgeBase.farewells);
+            }
+            
+            // Detectar respuestas positivas
+            if (isPositive(message)) {
+                return getRandomResponse(knowledgeBase.positiveResponses);
+            }
+            
+            // Buscar en la base de conocimiento según el tipo de chat
+            let response = searchInKnowledgeBase(message, chatType);
+            
+            // Si no se encontró respuesta específica, buscar en todas las categorías
+            if (!response) {
+                response = searchInKnowledgeBase(message, 'all');
+            }
+            
+            // Respuesta por defecto si no se encontró coincidencia
+            return response || getRandomResponse(knowledgeBase.defaultResponses);
+        }
+
+        // Buscar en la base de conocimiento
+        function searchInKnowledgeBase(message, category) {
+            if (category === 'complaint' || category === 'all') {
+                for (const [key, data] of Object.entries(knowledgeBase.complaints)) {
+                    if (containsAny(message, data.patterns)) {
+                        return `${getRandomResponse(data.responses)} ${data.followUp ? '\n\n' + data.followUp : ''}`;
+                    }
+                }
+            }
+            
+            if (category === 'order' || category === 'all') {
+                for (const [key, data] of Object.entries(knowledgeBase.orders)) {
+                    if (containsAny(message, data.patterns)) {
+                        return `${getRandomResponse(data.responses)} ${data.followUp ? '\n\n' + data.followUp : ''}`;
+                    }
+                }
+            }
+            
+            if (category === 'suggestion' || category === 'all') {
+                for (const [key, data] of Object.entries(knowledgeBase.suggestions)) {
+                    if (containsAny(message, data.patterns)) {
+                        return `${getRandomResponse(data.responses)} ${data.followUp ? '\n\n' + data.followUp : ''}`;
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        // Funciones de utilidad
+        function isGreeting(message) {
+            const greetings = ['hola', 'buenos días', 'buenas tardes', 'buenas noches', 'hi', 'hello', 'hey'];
+            return containsAny(message, greetings);
+        }
+
+        function isFarewell(message) {
+            const farewells = ['adiós', 'chao', 'hasta luego', 'nos vemos', 'gracias', 'bye', 'goodbye'];
+            return containsAny(message, farewells);
+        }
+
+        function isPositive(message) {
+            const positives = ['gracias', 'excelente', 'perfecto', 'genial', 'maravilloso', 'bueno', 'bien'];
+            return containsAny(message, positives);
+        }
+
+        function containsAny(text, patterns) {
+            return patterns.some(pattern => text.includes(pattern));
+        }
+
+        function getRandomResponse(responses) {
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function getSentimentIcon(sentiment) {
+            switch(sentiment) {
+                case 'positive': return '😊';
+                case 'negative': return '😔';
+                default: return '😐';
+            }
+        }
+
+        // Actualizar sentimiento del usuario
+        function updateUserSentiment(message) {
+            // Análisis simple de sentimiento
+            const positiveWords = ['gracias', 'excelente', 'perfecto', 'genial', 'maravilloso', 'bueno', 'contento', 'feliz'];
+            const negativeWords = ['mal', 'pésimo', 'terrible', 'horrible', 'decepcionado', 'enfadado', 'molesto', 'ira'];
+            
+            let positiveCount = 0;
+            let negativeCount = 0;
+            
+            positiveWords.forEach(word => {
+                if (message.includes(word)) positiveCount++;
+            });
+            
+            negativeWords.forEach(word => {
+                if (message.includes(word)) negativeCount++;
+            });
+            
+            if (positiveCount > negativeCount) {
+                userSentiment = 'positive';
+                satisfactionLevel = Math.min(100, satisfactionLevel + 2);
+            } else if (negativeCount > positiveCount) {
+                userSentiment = 'negative';
+                satisfactionLevel = Math.max(0, satisfactionLevel - 3);
+            }
+            
+            updateSatisfactionMeter();
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            // Simular estadísticas en tiempo real
+            const resolvedCount = document.getElementById('resolvedCount');
+            const satisfactionRate = document.getElementById('satisfactionRate');
+            const responseTime = document.getElementById('responseTime');
+            const activeChats = document.getElementById('activeChats');
+            
+            // Incrementar casos resueltos
+            let currentResolved = parseInt(resolvedCount.textContent.replace(',', ''));
+            resolvedCount.textContent = (currentResolved + 1).toLocaleString();
+            
+            // Actualizar tasa de satisfacción
+            satisfactionRate.textContent = `${satisfactionLevel}%`;
+            
+            // Tiempo de respuesta aleatorio (entre 1.8s y 2.8s)
+            responseTime.textContent = `${(Math.random() * 1 + 1.8).toFixed(1)}s`;
+            
+            // Chats activos aleatorios (entre 8 y 16)
+            activeChats.textContent = Math.floor(Math.random() * 9 + 8);
+        }
+
+        // Actualizar estadísticas basadas en sentimiento
+        function updateStatsBasedOnSentiment(sentiment) {
+            const resolvedCount = document.getElementById('resolvedCount');
+            let currentResolved = parseInt(resolvedCount.textContent.replace(',', ''));
+            
+            if (sentiment === 'positive') {
+                // Incrementar más rápido cuando la respuesta es positiva
+                resolvedCount.textContent = (currentResolved + 2).toLocaleString();
+            } else {
+                resolvedCount.textContent = (currentResolved + 1).toLocaleString();
+            }
+            
+            // Actualizar tasa de satisfacción
+            document.getElementById('satisfactionRate').textContent = `${satisfactionLevel}%`;
+        }
+
+        // Actualizar medidor de satisfacción
+        function updateSatisfactionMeter() {
+            const meterFill = document.getElementById('meterFill');
+            const satisfactionPercent = document.getElementById('satisfactionPercent');
+            
+            meterFill.style.width = `${satisfactionLevel}%`;
+            satisfactionPercent.textContent = `${satisfactionLevel}%`;
+            
+            // Cambiar color basado en el nivel
+            if (satisfactionLevel >= 80) {
+                meterFill.style.background = 'linear-gradient(90deg, var(--warning), var(--success))';
+            } else if (satisfactionLevel >= 60) {
+                meterFill.style.background = 'linear-gradient(90deg, var(--warning), var(--warning))';
+            } else {
+                meterFill.style.background = 'linear-gradient(90deg, var(--error), var(--warning))';
+            }
+        }
+
+        // Exportar conversación
+        function exportConversation() {
+            if (conversationHistory.length === 0) {
+                alert('No hay conversación para exportar.');
+                return;
+            }
+            
+            let exportText = 'Historial de Conversación - Frio Fantasy\n';
+            exportText += '========================================\n\n';
+            
+            conversationHistory.forEach(msg => {
+                const time = msg.time.getHours().toString().padStart(2, '0') + ':' + 
+                            msg.time.getMinutes().toString().padStart(2, '0');
+                const sender = msg.type === 'user' ? 'Tú' : 'Heladia AI';
+                exportText += `[${time}] ${sender}: ${msg.text}\n`;
+            });
+            
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `conversacion-friofantasy-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            addBotMessage('He exportado el historial de nuestra conversación. ¡Gracias por chatear con nosotros! 😊', 'positive');
+        }
+
+        // Agregar botón de exportación después de 3 mensajes
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            if (conversationHistory.length >= 3 && !document.getElementById('exportBtn')) {
+                const quickActions = document.getElementById('quickActions');
+                const exportBtn = document.createElement('button');
+                exportBtn.className = 'quick-action-btn';
+                exportBtn.id = 'exportBtn';
+                exportBtn.innerHTML = '<i class="fas fa-download"></i> Exportar conversación';
+                exportBtn.onclick = exportConversation;
+                quickActions.appendChild(exportBtn);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -9,6 +9,7 @@ const productsData = [
     category: "cremosos",
     description: "Migas de pan caramelizadas en helado cremoso de vainilla con un toque de canela."
   },
+
   
   {
     id: 2,

@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>FrioFantasy | Sistema de Facturación Enterprise</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5a67d8;
+      --primary-light: #7f9cf5;
+      --secondary: #764ba2;
+      --secondary-dark: #6b46c0;
+      --accent: #f687b3;
+      --success: #48bb78;
+      --success-dark: #38a169;
+      --danger: #f56565;
+      --warning: #ed8936;
+      --dark: #2d3748;
+      --dark-800: #1a202c;
+      --dark-700: #4a5568;
+      --gray-600: #718096;
+      --gray-400: #a0aec0;
+      --gray-200: #e2e8f0;
+      --gray-100: #edf2f7;
+      --glass-bg: rgba(255, 255, 255, 0.98);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+      --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+      --shadow-glow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    * { 
+      font-family: 'Poppins', 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Gradientes principales */
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      70% { transform: scale(1.1); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.7; }
+    }
+
+    .animate-fade-up { animation: fadeInUp 0.4s ease-out; }
+    .animate-slide-in { animation: slideIn 0.3s ease-out; }
+    .animate-scale-in { animation: scaleIn 0.2s ease-out; }
+
+    /* Sidebar mejorado */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 280px;
+      background: linear-gradient(180deg, #1a1c2e 0%, #2d1b4e 100%);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 10px 0 40px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.collapsed { width: 88px; }
+    .sidebar.collapsed .sidebar-text, .sidebar.collapsed .menu-label, .sidebar.collapsed .user-info { display: none; }
+    .sidebar.collapsed .logo-text { display: none; }
+    .sidebar.collapsed .logo-icon { margin: 0 auto; }
+    .sidebar.collapsed .menu-item { justify-content: center; padding: 12px; }
+    .sidebar.collapsed .menu-item i { margin: 0; }
+
+    .main-content { margin-left: 280px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-height: 100vh; }
+    .main-content.expanded { margin-left: 88px; }
+
+    .sidebar-nav { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 1rem; }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+
+    .menu-item {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      border-radius: 12px;
+      margin-bottom: 4px;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .menu-item:hover::before { opacity: 0.15; }
+    .menu-item.active { background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2)); border-left: 3px solid var(--primary); }
+    .menu-item.active i { color: var(--primary); }
+    .menu-item.active span { color: white; font-weight: 500; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-lg);
+      border-radius: 20px;
+    }
+    .glass-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-xl); }
+
+    .input-premium {
+      background: white;
+      border: 1.5px solid var(--gray-200);
+      transition: all 0.2s ease;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      width: 100%;
+    }
+    .input-premium:focus { border-color: var(--primary); box-shadow: var(--shadow-glow); outline: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4); }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--success), #68d391);
+      color: white;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      border: none;
+    }
+    .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 10px 25px -5px rgba(72, 187, 120, 0.3); }
+
+    .stat-card {
+      background: linear-gradient(135deg, white, var(--gray-100));
+      border-radius: 20px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-xl); }
+
+    .badge-stock-high { background: linear-gradient(135deg, var(--success), #68d391); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .badge-stock-low { background: linear-gradient(135deg, var(--warning), #f6ad55); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .badge-stock-out { background: linear-gradient(135deg, var(--danger), #fc8181); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .web-data-badge { background: linear-gradient(135deg, #48bb78, #68d391); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; margin-left: 8px; display: inline-block; }
+
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .data-table th { background: var(--gray-100); padding: 1rem; font-weight: 600; color: var(--dark-700); font-size: 0.875rem; border-bottom: 2px solid var(--gray-200); text-align: left; }
+    .data-table td { padding: 1rem; border-bottom: 1px solid var(--gray-200); font-size: 0.875rem; }
+    .data-table tr:hover { background: var(--gray-100); transition: all 0.2s ease; }
+
+    .float-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-xl);
+      transition: all 0.3s ease;
+      z-index: 99;
+    }
+    .float-btn:hover { transform: scale(1.1); }
+
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 101;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .main-content.expanded { margin-left: 0; }
+      .mobile-menu-btn { display: flex; }
+    }
+
+    .cart-item-premium {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      transition: all 0.2s ease;
+      border: 1px solid var(--gray-200);
+    }
+    .cart-item-premium:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+
+    /* Modal de notificaciones mejorado */
+    .notification-modal {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      width: 380px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow-2xl);
+      z-index: 200;
+      display: none;
+      animation: scaleIn 0.2s ease-out;
+    }
+    .notification-modal.show { display: block; }
+
+    .notification-badge { position: relative; }
+    .notification-badge .new-indicator {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 12px;
+      height: 12px;
+      background: #f56565;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    .notification-badge .new-indicator.hidden { display: none; }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--dark-700); }
+    .permission-group { border: 1px solid var(--gray-200); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .permission-group-title { font-weight: 600; margin-bottom: 0.75rem; color: var(--dark); }
+    .permission-item { display: inline-flex; align-items: center; margin-right: 1rem; margin-bottom: 0.5rem; }
+    .permission-item input { margin-right: 0.5rem; }
+    
+    .notification-item {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .notification-item:hover {
+      background: #f7fafc;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Pantalla de Login -->
+<div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center gradient-bg">
+  <div class="bg-white rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl animate-scale-in">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto shadow-lg mb-4 gradient-bg">
+        <i class="fas fa-ice-cream text-white text-4xl"></i>
+      </div>
+      <h2 class="text-3xl font-bold gradient-text">FrioFantasy</h2>
+      <p class="text-gray-500 mt-2">Sistema de Facturación Enterprise</p>
+    </div>
+    <div class="space-y-5">
+      <div><label class="form-label">Usuario</label><div class="relative"><i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="loginUsername" class="input-premium pl-10" placeholder="Ingrese su usuario"></div></div>
+      <div><label class="form-label">Contraseña</label><div class="relative"><i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="password" id="loginPassword" class="input-premium pl-10" placeholder="••••••••"></div></div>
+      <button type="button" onclick="handleLogin()" class="btn-primary w-full">Acceder al Sistema</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Menu Button -->
+<div class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileSidebar()" style="display: none;"><i class="fas fa-bars text-white text-xl"></i></div>
+
+<!-- Modal de Notificaciones Mejorado -->
+<div class="notification-modal" id="notificationModal">
+  <div class="p-4 border-b gradient-bg rounded-t-2xl" style="border-color: rgba(255,255,255,0.2);">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <i class="fas fa-bell text-white"></i>
+        <h3 class="font-bold text-lg text-white">Notificaciones</h3>
+      </div>
+      <button onclick="closeNotificationModal()" class="text-white/70 hover:text-white transition"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="p-4 max-h-96 overflow-y-auto" id="notificationsList">
+    <div class="text-center text-gray-500 py-8">
+      <i class="fas fa-bell-slash text-4xl mb-2 text-gray-300"></i>
+      <p>No hay notificaciones</p>
+    </div>
+  </div>
+  <div class="p-3 border-t bg-gray-50 rounded-b-2xl">
+    <button onclick="marcarTodasLeidas()" class="text-xs text-indigo-500 hover:text-indigo-700 w-full text-center">
+      <i class="fas fa-check-double mr-1"></i> Marcar todas como leídas
+    </button>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar" style="display: none;">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3 logo-icon">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg gradient-bg">
+          <i class="fas fa-ice-cream text-white text-xl"></i>
+        </div>
+        <div class="logo-text">
+          <h1 class="text-white font-bold text-2xl tracking-tight">FrioFantasy</h1>
+          <p class="text-purple-300 text-xs">Enterprise v7.0</p>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white transition hidden md:block">
+        <i class="fas fa-chevron-left text-xl" id="sidebarToggleIcon"></i>
+      </button>
+    </div>
+    <div class="user-info text-center mb-6 p-4 rounded-2xl" style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);">
+      <div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-3 shadow-lg gradient-bg">
+        <i class="fas fa-user-astronaut text-white text-2xl"></i>
+      </div>
+      <p class="text-white font-semibold text-lg" id="sidebarUserName">Administrador</p>
+      <p class="text-purple-300 text-xs mt-1" id="sidebarUserRole">Admin</p>
+    </div>
+  </div>
+  <div class="sidebar-nav"><nav class="space-y-1" id="sidebarMenu"></nav></div>
+  <div class="p-6">
+    <button onclick="logoutWithCashClose()" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 transition-all">
+      <i class="fas fa-sign-out-alt text-xl w-6"></i>
+      <span class="sidebar-text text-sm font-medium">Cerrar Sesión</span>
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent" style="display: none;">
+  <div class="sticky top-0 z-40" style="background: white; border-bottom: 1px solid var(--gray-200);">
+    <div class="px-8 py-4 flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h2 class="text-2xl font-bold gradient-text" id="pageTitle">Dashboard</h2>
+        <p class="text-sm" style="color: var(--gray-600);" id="pageSubtitle">Bienvenido de vuelta</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <!-- Indicador conexión/internet -->
+        <div id="networkIndicator" title="Estado de conexión con Firebase" class="flex items-center gap-2 px-3 py-2 rounded-full" style="background:var(--gray-100);transition:background 0.3s;">
+          <span id="networkDot" style="width:9px;height:9px;border-radius:50%;background:#48bb78;display:inline-block;transition:background 0.3s;"></span>
+          <i id="networkIcon" class="fas fa-wifi" style="color:#48bb78;font-size:0.85rem;transition:color 0.3s;"></i>
+          <span id="networkLabel" class="text-xs font-semibold" style="color:#48bb78;transition:color 0.3s;">En línea</span>
+          <span id="pendingBadge" class="hidden text-xs font-bold px-2 py-0.5 rounded-full" style="background:#ed8936;color:white;"></span>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full" style="background: var(--gray-100);">
+          <i class="fas fa-calendar-alt" style="color: var(--primary);"></i>
+          <span class="text-sm font-medium" style="color: var(--dark-700);" id="currentDateTime"></span>
+        </div>
+        <div class="relative cursor-pointer notification-badge" onclick="toggleNotificationModal()" id="notificationBell">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center transition" style="background: var(--gray-100);">
+            <i class="fas fa-bell" style="color: var(--gray-600);"></i>
+          </div>
+          <div class="hidden new-indicator" id="notificationIndicator"></div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center gradient-bg">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
+          <div class="hidden md:block">
+            <p class="font-semibold text-sm" style="color: var(--dark);" id="headerUserName">Admin</p>
+            <p class="text-xs" style="color: var(--gray-600);" id="headerUserRole">Administrador</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="p-8" id="moduleContent">
+    <div class="text-center py-20">
+      <div class="text-gray-400">Selecciona un módulo del menú</div>
+    </div>
+  </div>
+</div>
+
+<div class="float-btn" id="floatBtn" style="display: none;" onclick="showHelp()">
+  <i class="fas fa-question text-white text-2xl"></i>
+</div>
+
+<script>
+// ======================== DATOS WEB Y NOTIFICACIONES MEJORADAS ========================
+let webData = { pedidos: [], clientes: [], suscriptores: [], ultimaActualizacion: null };
+let notificacionesWeb = [];
+
+function cargarDatosWeb() {
+  const stored = localStorage.getItem('friofantasy_webhook_data');
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      webData.pedidos = parsed.pedidos || [];
+      webData.clientes = parsed.clientes || [];
+      webData.suscriptores = parsed.suscriptores || [];
+      webData.ultimaActualizacion = parsed.ultimaActualizacion || new Date().toISOString();
+      console.log('✅ Datos web cargados:', webData.pedidos.length, 'pedidos,', webData.clientes.length, 'clientes');
+    } catch(e) { console.log('Error cargando datos web:', e); }
+  }
+  if (webData.pedidos.length === 0 && webData.clientes.length === 0) {
+    webData = { pedidos: [], clientes: [], suscriptores: [], ultimaActualizacion: new Date().toISOString() };
+    localStorage.setItem('friofantasy_webhook_data', JSON.stringify(webData));
+  }
+  
+  // Simular recepción de datos web periódicamente para pruebas
+  window.addEventListener('datosWebActualizados', function(event) {
+    console.log('📡 Evento recibido de la tienda:', event.detail);
+    cargarDatosWeb();
+    agregarNotificacionWeb(event.detail);
+    if (currentUser && document.getElementById('moduleContent').innerHTML.includes('Datos de la Web')) renderWebData();
+    if (currentUser && document.getElementById('moduleContent').innerHTML.includes('Pedidos')) loadModule('orders');
+  });
+}
+
+function agregarNotificacionWeb(datos) {
+  const nuevaNotificacion = { 
+    id: Date.now(), 
+    tipo: datos.tipo, 
+    datos: datos.datos, 
+    fecha: new Date().toLocaleString(), 
+    leida: false,
+    timestamp: new Date().getTime()
+  };
+  notificacionesWeb.unshift(nuevaNotificacion);
+  while (notificacionesWeb.length > 50) notificacionesWeb.pop();
+  localStorage.setItem('friofantasy_notificaciones', JSON.stringify(notificacionesWeb));
+  actualizarIndicadorNotificaciones();
+  
+  // Mostrar toast de notificación
+  let mensaje = '';
+  let icono = 'info';
+  let titulo = '¡Nuevos Datos de la Web!';
+  
+  if (datos.tipo === 'pedido') {
+    mensaje = `📦 Nuevo pedido de ${datos.datos.cliente_nombre || 'cliente'} por ${formatCurrency(datos.datos.total || 0)}`;
+    icono = 'success';
+  } else if (datos.tipo === 'cliente') {
+    mensaje = `👤 Nuevo cliente registrado: ${datos.datos.nombre || datos.datos.email}`;
+    icono = 'info';
+  } else if (datos.tipo === 'suscripcion') {
+    mensaje = `📧 Nueva suscripción: ${datos.datos.email}`;
+    icono = 'success';
+  }
+  
+  if (mensaje && typeof Swal !== 'undefined') {
+    Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: icono,
+      timer: 4000,
+      showConfirmButton: false,
+      position: 'top-end',
+      toast: true,
+      background: 'white',
+      timerProgressBar: true
+    });
+  }
+}
+
+function cargarNotificaciones() {
+  const stored = localStorage.getItem('friofantasy_notificaciones');
+  if (stored) { 
+    try { 
+      notificacionesWeb = JSON.parse(stored); 
+    } catch(e) { 
+      notificacionesWeb = []; 
+    } 
+  }
+  actualizarIndicadorNotificaciones();
+}
+
+function actualizarIndicadorNotificaciones() {
+  const noLeidas = notificacionesWeb.filter(n => !n.leida).length;
+  const indicator = document.getElementById('notificationIndicator');
+  if (indicator) indicator.classList.toggle('hidden', noLeidas === 0);
+}
+
+function toggleNotificationModal() {
+  const modal = document.getElementById('notificationModal');
+  const listContainer = document.getElementById('notificationsList');
+  
+  if (notificacionesWeb.length === 0) {
+    listContainer.innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-bell-slash text-4xl mb-2 text-gray-300"></i><p>No hay notificaciones</p></div>';
+  } else {
+    listContainer.innerHTML = notificacionesWeb.map(n => `
+      <div class="notification-item p-3 border-b ${n.leida ? 'opacity-60' : 'bg-indigo-50'}" style="border-color: var(--gray-200);" onclick="marcarNotificacionLeida(${n.id})">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-lg">${n.tipo === 'pedido' ? '📦' : n.tipo === 'cliente' ? '👤' : '📧'}</span>
+              <span class="font-medium text-sm" style="color: var(--dark);">
+                ${n.tipo === 'pedido' ? 'Nuevo Pedido' : n.tipo === 'cliente' ? 'Nuevo Cliente' : 'Nueva Suscripción'}
+              </span>
+              ${!n.leida ? '<span class="ml-2 w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>' : ''}
+            </div>
+            <div class="text-xs" style="color: var(--gray-600);">
+              ${n.tipo === 'pedido' ? 
+                `Cliente: ${n.datos.cliente_nombre || 'N/A'}<br>Total: ${formatCurrency(n.datos.total || 0)}` : 
+                n.tipo === 'cliente' ? 
+                `Nombre: ${n.datos.nombre || 'N/A'}<br>Email: ${n.datos.email || 'N/A'}` : 
+                `Email: ${n.datos.email}`}
+            </div>
+            <div class="text-xs text-gray-400 mt-1">
+              <i class="far fa-clock mr-1"></i> ${n.fecha}
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  modal.classList.toggle('show');
+}
+
+function marcarNotificacionLeida(id) {
+  const notif = notificacionesWeb.find(n => n.id === id);
+  if (notif) notif.leida = true;
+  localStorage.setItem('friofantasy_notificaciones', JSON.stringify(notificacionesWeb));
+  actualizarIndicadorNotificaciones();
+  toggleNotificationModal();
+}
+
+function marcarTodasLeidas() {
+  notificacionesWeb.forEach(n => n.leida = true);
+  localStorage.setItem('friofantasy_notificaciones', JSON.stringify(notificacionesWeb));
+  actualizarIndicadorNotificaciones();
+  toggleNotificationModal();
+  Swal.fire({ title: 'Actualizado', text: 'Todas las notificaciones marcadas como leídas', icon: 'success', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+}
+
+function closeNotificationModal() { 
+  document.getElementById('notificationModal').classList.remove('show'); 
+}
+
+// ======================== FUNCIONES HELPER ========================
+function safeParseFloat(val, defaultValue = 0) { if(val === undefined || val === null) return defaultValue; const parsed = parseFloat(String(val).replace(/,/g, '')); return isNaN(parsed) ? defaultValue : parsed; }
+function safeParseInt(val, defaultValue = 0) { const parsed = parseInt(val); return isNaN(parsed) ? defaultValue : parsed; }
+function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
+function formatDateForCompare(dateStr) { if(!dateStr) return ''; var parts = dateStr.split(',')[0].split('/'); if(parts.length === 3) return parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0'); return dateStr; }
+function getCurrentISODate() { var now = new Date(); return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0'); }
+function formatCurrency(amount) { if(amount === undefined || amount === null) return 'RD$ 0.00'; return new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }).format(amount); }
+function getCurrentDateTime() { return new Date().toLocaleString('es-ES', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+function updateDateTime() { const el = document.getElementById('currentDateTime'); if(el) el.innerHTML = getCurrentDateTime(); }
+
+// ======================== DATOS INICIALES ========================
+let systemConfig = { itbisRate: 18, companyName: "FrioFantasy", companyRnc: "123456789", companyPhone: "809-555-0000", companyAddress: "Calle Principal #123, Santo Domingo" };
+let appData = { products: [], customers: [], invoices: [], salesWithoutInvoice: [], orders: [], users: [], cashSessions: { open: true, currentCash: 15000, lastClose: null }, nextInvoiceId: 1001, nextTicketId: 5001, nextOrderId: 3001 };
+let currentUser = null;
+let currentCart = [];
+
+function initializeData() {
+  // Solo crear usuario admin por defecto si no hay NINGÚN usuario guardado
+  // (nunca sobrescribir con datos de demo)
+  if (appData.users.length === 0) {
+    appData.users = [
+      { id: 1, username: "admin", password: "admin123", name: "Administrador del Sistema", role: "administrador", permissions: ["pos","inventory","customers","invoices_history","orders","reports","cash","users","config","webdata"], active: true }
+    ];
+  }
+  // Productos, clientes, facturas, pedidos: dejar vacíos si no hay datos guardados
+  // Se administran desde Firebase / el sistema
+}
+
+function loadData() {
+  const saved = localStorage.getItem('friofantasy_data_v10');
+  if (saved) {
+    try {
+      const p = JSON.parse(saved);
+      appData.products         = p.products         || [];
+      appData.customers        = p.customers        || [];
+      appData.users            = p.users            || [];
+      appData.invoices         = p.invoices         || [];
+      appData.salesWithoutInvoice = p.salesWithoutInvoice || [];
+      appData.orders           = p.orders           || [];
+      appData.cashSessions     = p.cashSessions     || { open: true, currentCash: 0, lastClose: null };
+      appData.nextInvoiceId    = p.nextInvoiceId    || 1001;
+      appData.nextTicketId     = p.nextTicketId     || 5001;
+      appData.nextOrderId      = p.nextOrderId      || 3001;
+      if (p.systemConfig) systemConfig = p.systemConfig;
+      console.log("✅ Datos cargados desde localStorage");
+    } catch(e) { console.log("Error cargando datos:", e); }
+  }
+  initializeData(); // solo pone admin si users está vacío
+}
+
+function saveData() {
+  const data = { products: appData.products, customers: appData.customers, invoices: appData.invoices, salesWithoutInvoice: appData.salesWithoutInvoice, orders: appData.orders, users: appData.users, cashSessions: appData.cashSessions, nextInvoiceId: appData.nextInvoiceId, nextTicketId: appData.nextTicketId, nextOrderId: appData.nextOrderId, systemConfig: systemConfig };
+  localStorage.setItem('friofantasy_data_v10', JSON.stringify(data));
+  if (typeof firebaseDB !== 'undefined' && firebaseDB && navigator.onLine) {
+    firebaseSyncTodas(data);
+  } else if (!navigator.onLine) {
+    const cola = JSON.parse(localStorage.getItem('ff_cola_offline') || '[]');
+    cola.push({ ts: Date.now() });
+    localStorage.setItem('ff_cola_offline', JSON.stringify(cola));
+    actualizarIndicadorRed();
+    console.log('📵 Guardado offline – se sincronizará al reconectar');
+  }
+}
+
+function firebaseSyncTodas(data) {
+  if (!firebaseDB) return;
+  try {
+    const fb = firebaseDB.ref('sistema');
+    const products = {}; (data.products||[]).forEach(p => { products['p'+p.id] = p; });
+    fb.child('productos').set(products).catch(()=>{});
+    const customers = {}; (data.customers||[]).forEach(c => { customers['c'+c.id] = c; });
+    fb.child('clientes').set(customers).catch(()=>{});
+    const users = {}; (data.users||[]).forEach(u => { users['u'+u.id] = u; });
+    fb.child('usuarios').set(users).catch(()=>{});
+    const invoices = {}; (data.invoices||[]).forEach(f => { invoices['f'+f.id] = f; });
+    fb.child('facturas').set(invoices).catch(()=>{});
+    const orders = {}; (data.orders||[]).forEach(o => { orders['o'+o.id] = o; });
+    fb.child('ordenes').set(orders).catch(()=>{});
+    fb.child('caja').set(data.cashSessions).catch(()=>{});
+    fb.child('config').set(data.systemConfig).catch(()=>{});
+    fb.child('contadores').set({ nextInvoiceId: data.nextInvoiceId, nextTicketId: data.nextTicketId, nextOrderId: data.nextOrderId }).catch(()=>{});
+  } catch(e) { console.warn('Firebase sync error:', e); }
+}
+function getNextId(items) { if(items.length === 0) return 1; return Math.max(...items.map(i => i.id)) + 1; }
+
+// ======================== IMPRESIÓN DE FACTURAS ========================
+function imprimirFactura(id, tipo = 'factura') {
+  let data = null, titulo = '';
+  if (tipo === 'factura') { data = appData.invoices.find(i => i.id === id); titulo = `FACTURA #${data.invoiceNumber}`; }
+  else if (tipo === 'pedido') { data = appData.orders.find(o => o.id === id); titulo = `PEDIDO #${data.orderNumber}`; }
+  else if (tipo === 'pedidoWeb') { cargarDatosWeb(); data = webData.pedidos.find(p => p.orderNumber === id); titulo = `PEDIDO WEB #${data.orderNumber}`; }
+  if (!data) { Swal.fire('Error', 'No se encontraron datos para imprimir', 'error'); return; }
+  let itemsHtml = '';
+  for (let item of (data.items || [])) {
+    itemsHtml += `<tr style="border-bottom:1px solid #ddd;"><td style="padding:8px;text-align:left;">${item.cantidad || item.qty || 1}x</td><td style="padding:8px;text-align:left;">${escapeHtml(item.nombre || item.name)}${item.size ? `<br><small style="color:#666;">Tamaño: ${item.size}</small>` : ''}${item.customization ? `<br><small style="color:#666;">${item.customization}</small>` : ''}</td><td style="padding:8px;text-align:right;">${formatCurrency(item.precio_unitario || item.price || 0)}</td><td style="padding:8px;text-align:right;">${formatCurrency((item.cantidad || item.qty || 1) * (item.precio_unitario || item.price || 0))}</td></tr>`;
+  }
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${titulo}</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Courier New',monospace;padding:20px;max-width:800px;margin:0 auto;background:white;}.header{text-align:center;margin-bottom:20px;border-bottom:2px solid #333;padding-bottom:10px;}.info-section{margin-bottom:20px;padding:10px;background:#f5f5f5;border-radius:5px;}.info-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;}table{width:100%;border-collapse:collapse;margin-bottom:20px;}th{background:#333;color:white;padding:10px;font-size:12px;}td{padding:8px;border-bottom:1px solid #ddd;font-size:12px;}.totals{text-align:right;margin-top:20px;padding-top:10px;border-top:2px solid #333;}.footer{text-align:center;margin-top:30px;font-size:10px;color:#666;border-top:1px solid #ccc;padding-top:10px;}@media print{body{margin:0;padding:10px;}.no-print{display:none;}}</style></head><body><div class="header"><h1>${systemConfig.companyName}</h1><p>RNC: ${systemConfig.companyRnc} | Tel: ${systemConfig.companyPhone}</p><p>${systemConfig.companyAddress}</p><h2>${titulo}</h2></div><div class="info-section"><div class="info-row"><strong>Fecha:</strong> ${data.date || data.fecha_registro || getCurrentDateTime()}</div><div class="info-row"><strong>Cliente:</strong> ${escapeHtml(data.clientName || data.cliente_nombre || 'Consumidor Final')}</div>${data.rnc ? `<div class="info-row"><strong>RNC:</strong> ${data.rnc}</div>` : ''}${data.cliente_email ? `<div class="info-row"><strong>Email:</strong> ${data.cliente_email}</div>` : ''}${data.cliente_telefono ? `<div class="info-row"><strong>Teléfono:</strong> ${data.cliente_telefono}</div>` : ''}${data.direccion ? `<div class="info-row"><strong>Dirección:</strong> ${data.direccion}</div>` : ''}<div class="info-row"><strong>Método de Pago:</strong> ${data.paymentMethod || data.metodo_pago || 'Efectivo'}</div><div class="info-row"><strong>Entrega:</strong> ${data.delivery_type === 'delivery' ? 'Envío a domicilio' : (data.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Recoger en tienda')}</div></div><table><thead><tr><th>Cant</th><th>Descripción</th><th>Precio</th><th>Subtotal</th></tr></thead><tbody>${itemsHtml}</tbody></table><div class="totals"><p><strong>Subtotal:</strong> ${formatCurrency(data.subtotal || 0)}</p><p><strong>ITBIS (${systemConfig.itbisRate}%):</strong> ${formatCurrency(data.tax || data.itbis || 0)}</p><p style="font-size:16px;margin-top:5px;"><strong>TOTAL:</strong> ${formatCurrency(data.total || 0)}</p></div><div class="footer"><p>¡Gracias por tu compra en FrioFantasy!</p><p>🍦 Helados artesanales desde 1995</p><p>${new Date().toLocaleString()}</p></div><div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 20px;background:#667eea;color:white;border:none;border-radius:5px;cursor:pointer;">🖨️ Imprimir</button><button onclick="window.close()" style="padding:10px 20px;background:#f56565;color:white;border:none;border-radius:5px;cursor:pointer;margin-left:10px;">Cerrar</button></div><script>setTimeout(() => { window.print(); }, 500);<\/script></body></html>`);
+  printWindow.document.close();
+}
+
+// ======================== SIDEBAR ========================
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar'), main = document.getElementById('mainContent'), icon = document.getElementById('sidebarToggleIcon');
+  if(sidebar && main) { sidebar.classList.toggle('collapsed'); main.classList.toggle('expanded'); if(icon) { if(sidebar.classList.contains('collapsed')) { icon.classList.remove('fa-chevron-left'); icon.classList.add('fa-chevron-right'); } else { icon.classList.remove('fa-chevron-right'); icon.classList.add('fa-chevron-left'); } } }
+}
+function toggleMobileSidebar() { const sidebar = document.getElementById('sidebar'); if(sidebar) sidebar.classList.toggle('mobile-open'); }
+function renderSidebarMenu() {
+  const container = document.getElementById('sidebarMenu'); if(!container || !currentUser) return;
+  const menuItems = { pos: { icon: "fa-cash-register", label: "Punto de Venta", color: "#48bb78" }, inventory: { icon: "fa-boxes", label: "Inventario", color: "#4299e1" }, customers: { icon: "fa-users", label: "Clientes", color: "#9f7aea" }, invoices_history: { icon: "fa-file-invoice", label: "Facturas", color: "#667eea" }, orders: { icon: "fa-truck", label: "Pedidos", color: "#ed8936" }, reports: { icon: "fa-chart-line", label: "Reportes", color: "#ed8936" }, cash: { icon: "fa-wallet", label: "Caja", color: "#38b2ac" }, users: { icon: "fa-user-cog", label: "Usuarios", color: "#f56565" }, config: { icon: "fa-cog", label: "Configuración", color: "#718096" }, webdata: { icon: "fa-globe", label: "Datos Web", color: "#48bb78" } };
+  let html = ''; for(var i = 0; i < currentUser.permissions.length; i++) { var mod = currentUser.permissions[i]; if(menuItems[mod]) { html += `<button onclick="loadModule('${mod}')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all group"><i class="fas ${menuItems[mod].icon} text-xl w-6" style="color: ${menuItems[mod].color};"></i><span class="sidebar-text text-sm font-medium">${menuItems[mod].label}</span></button>`; } }
+  container.innerHTML = html;
+}
+
+// ======================== MÓDULO DATOS WEB ========================
+function renderWebData() {
+  cargarDatosWeb();
+  const totalPedidosWeb = webData.pedidos.length, totalClientesWeb = webData.clientes.length, totalSuscriptoresWeb = webData.suscriptores.length, totalVentasWeb = webData.pedidos.reduce((sum, p) => sum + (p.total || 0), 0), pedidosPendientes = webData.pedidos.filter(p => p.estado !== 'completado').length, ultimosPedidos = webData.pedidos.slice(0, 5);
+  return `<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><div class="flex justify-between items-center mb-6"><div><h2 class="text-2xl font-bold gradient-text">Datos de la Tienda Web</h2><p class="text-sm" style="color:var(--gray-600);">Pedidos, clientes y suscripciones registradas</p></div><button onclick="syncWebData()" class="px-4 py-2 rounded-xl font-semibold" style="background:#48bb78;color:white;border:none;cursor:pointer;"><i class="fas fa-sync-alt mr-2"></i>Sincronizar</button></div><div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8"><div class="stat-card text-center"><i class="fas fa-shopping-cart text-3xl mb-2" style="color:#ed8936;"></i><p class="text-xs">Pedidos Web</p><p class="text-2xl font-bold">${totalPedidosWeb}</p>${pedidosPendientes > 0 ? `<span class="badge-stock-high text-xs inline-block">${pedidosPendientes} pendientes</span>` : ''}</div><div class="stat-card text-center"><i class="fas fa-users text-3xl mb-2" style="color:#9f7aea;"></i><p class="text-xs">Clientes Registrados</p><p class="text-2xl font-bold">${totalClientesWeb}</p></div><div class="stat-card text-center"><i class="fas fa-envelope text-3xl mb-2" style="color:#48bb78;"></i><p class="text-xs">Suscriptores</p><p class="text-2xl font-bold">${totalSuscriptoresWeb}</p></div><div class="stat-card text-center"><i class="fas fa-chart-line text-3xl mb-2" style="color:#667eea;"></i><p class="text-xs">Total Ventas Web</p><p class="text-2xl font-bold">${formatCurrency(totalVentasWeb)}</p></div></div><div class="mb-8"><h3 class="font-bold text-lg mb-4"><i class="fas fa-clock" style="color:#ed8936;"></i> Últimos Pedidos</h3>${ultimosPedidos.length === 0 ? '<div class="text-center py-8" style="background:var(--gray-100);border-radius:20px;"><p class="text-gray-500">No hay pedidos</p></div>' : `<div class="space-y-3">${ultimosPedidos.map(p => `<div class="stat-card"><div class="flex justify-between items-start flex-wrap gap-4"><div><div class="flex items-center gap-3 mb-2"><span class="text-lg font-bold" style="color:#ed8936;">${p.orderNumber || 'N/A'}</span><span class="web-data-badge">Web</span><span class="px-3 py-1 rounded-full text-xs" style="background:${p.estado === 'pendiente' ? '#fef3c7' : '#d1fae5'};color:${p.estado === 'pendiente' ? '#92400e' : '#065f46'};">${p.estado === 'pendiente' ? 'Pendiente' : 'Completado'}</span></div><p><i class="fas fa-user mr-2"></i>${escapeHtml(p.cliente_nombre || 'Cliente')}</p><p class="text-sm"><i class="fas fa-calendar mr-2"></i>${p.fecha_registro || p.fecha || 'N/A'}</p><div class="mt-2 p-2 rounded-lg" style="background:var(--gray-100);"><p class="text-xs font-semibold">Productos:</p>${(p.items || []).slice(0,2).map(i => `<div class="text-xs">• ${i.cantidad || 1}x ${escapeHtml(i.nombre || i.name)}${i.size ? ` (${i.size})` : ''}</div>`).join('')}${(p.items || []).length > 2 ? `<div class="text-xs text-gray-500">+${p.items.length-2} más</div>` : ''}</div></div><div class="text-right"><p class="text-xl font-bold" style="color:#ed8936;">${formatCurrency(p.total || 0)}</p><div class="flex gap-2 mt-2"><button onclick="imprimirFactura('${p.orderNumber}', 'pedidoWeb')" class="px-3 py-1 text-xs rounded-lg" style="background:#667eea;color:white;border:none;cursor:pointer;"><i class="fas fa-print"></i> Imprimir</button><button onclick="verPedidoWeb('${p.orderNumber}')" class="px-3 py-1 text-xs rounded-lg" style="background:#ed8936;color:white;border:none;cursor:pointer;"><i class="fas fa-eye"></i> Ver</button>${p.estado !== 'completado' ? `<button onclick="marcarPedidoWebCompletado('${p.orderNumber}')" class="px-3 py-1 text-xs rounded-lg" style="background:#48bb78;color:white;border:none;cursor:pointer;"><i class="fas fa-check-circle"></i> Completar</button>` : ''}</div></div></div></div>`).join('')}</div>`}</div><div class="mb-8"><h3 class="font-bold text-lg mb-4"><i class="fas fa-user-plus" style="color:#9f7aea;"></i> Clientes Registrados</h3>${webData.clientes.length === 0 ? '<div class="text-center py-8" style="background:var(--gray-100);border-radius:20px;"><p class="text-gray-500">No hay clientes</p></div>' : `<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">${webData.clientes.slice(0,6).map(c => `<div class="stat-card"><div class="flex items-center gap-3 mb-2"><div class="w-10 h-10 rounded-full flex items-center justify-center gradient-bg"><i class="fas fa-user text-white text-sm"></i></div><div><p class="font-semibold">${escapeHtml(c.nombre || 'N/A')}</p><p class="text-xs">${escapeHtml(c.email || 'N/A')}</p></div></div><div class="text-xs space-y-1">${c.telefono ? `<p><i class="fas fa-phone w-4"></i> ${c.telefono}</p>` : ''}<p><i class="fas fa-calendar w-4"></i> Registro: ${c.fecha_registro || 'N/A'}</p></div><div class="mt-2 pt-2" style="border-top:1px solid var(--gray-200);"><span class="web-data-badge">Web</span></div></div>`).join('')}</div>${webData.clientes.length > 6 ? `<div class="text-center mt-4"><p class="text-sm text-gray-500">+${webData.clientes.length-6} clientes más</p></div>` : ''}</div>`}</div><div><h3 class="font-bold text-lg mb-4"><i class="fas fa-envelope" style="color:#48bb78;"></i> Suscriptores</h3>${webData.suscriptores.length === 0 ? '<div class="text-center py-8" style="background:var(--gray-100);border-radius:20px;"><p class="text-gray-500">No hay suscriptores</p></div>' : `<div class="flex flex-wrap gap-2">${webData.suscriptores.map(s => `<span class="px-3 py-1 rounded-full text-sm" style="background:#e0f2fe;color:#0369a1;">${escapeHtml(s.email)}</span>`).join('')}</div>`}</div></div></div>`;
+}
+
+function verPedidoWeb(orderNumber) {
+  cargarDatosWeb();
+  const pedido = webData.pedidos.find(p => p.orderNumber === orderNumber);
+  if (!pedido) return;
+  let itemsHtml = '';
+  if (pedido.items && pedido.items.length) {
+    itemsHtml = '<div class="space-y-3 max-h-60 overflow-y-auto">';
+    for (var item of pedido.items) {
+      itemsHtml += `<div class="p-3 rounded-lg" style="background:var(--gray-100);"><div class="flex justify-between items-start"><div class="flex-1"><p class="font-medium">${item.cantidad || 1}x ${escapeHtml(item.nombre || item.name || 'Producto')}</p>${item.size ? `<p class="text-xs text-gray-500">Tamaño: ${item.size}</p>` : ''}${item.customization ? `<p class="text-xs text-gray-500 italic">${item.customization}</p>` : ''}</div><div class="text-right"><p class="font-semibold">${formatCurrency((item.cantidad || 1) * (item.precio_unitario || 0))}</p><p class="text-xs text-gray-500">${formatCurrency(item.precio_unitario || 0)} c/u</p></div></div></div>`;
+    }
+    itemsHtml += '</div>';
+  }
+  Swal.fire({ title: `<i class="fas fa-shopping-cart"></i> Pedido #${pedido.orderNumber}`, html: `<div class="text-left" style="max-height:70vh;overflow-y:auto;"><div class="p-4 rounded-xl mb-4" style="background:var(--gray-100);"><div class="grid grid-cols-2 gap-2 text-sm"><div><strong>Cliente:</strong></div><div>${escapeHtml(pedido.cliente_nombre || 'N/A')}</div><div><strong>Email:</strong></div><div>${escapeHtml(pedido.cliente_email || 'N/A')}</div><div><strong>Teléfono:</strong></div><div>${escapeHtml(pedido.cliente_telefono || 'N/A')}</div><div><strong>Dirección:</strong></div><div>${escapeHtml(pedido.direccion || 'N/A')}</div><div><strong>Fecha:</strong></div><div>${pedido.fecha_registro || pedido.fecha || 'N/A'}</div><div><strong>Método de Pago:</strong></div><div>${pedido.metodo_pago || 'N/A'}</div><div><strong>Entrega:</strong></div><div>${pedido.delivery_type === 'delivery' ? '🚚 Envío a domicilio' : '🏪 Recoger en tienda'}</div></div></div><p class="font-bold mb-3">🍦 Productos:</p>${itemsHtml || '<p class="text-gray-500">No hay productos detallados</p>'}<div class="border-t mt-4 pt-4"><div class="flex justify-between"><span>Subtotal:</span><span>${formatCurrency(pedido.subtotal || 0)}</span></div><div class="flex justify-between"><span>ITBIS (18%):</span><span>${formatCurrency(pedido.itbis || 0)}</span></div><div class="flex justify-between text-xl font-bold mt-2" style="color:#ed8936;"><span>TOTAL:</span><span>${formatCurrency(pedido.total || 0)}</span></div></div></div>`, width: 550, confirmButtonColor: '#ed8936', confirmButtonText: 'Cerrar', showCancelButton: true, cancelButtonText: '🖨️ Imprimir', cancelButtonColor: '#667eea', didOpen: () => { const cancelBtn = document.querySelector('.swal2-cancel'); if(cancelBtn) cancelBtn.onclick = () => { Swal.close(); imprimirFactura(pedido.orderNumber, 'pedidoWeb'); }; } });
+}
+
+function marcarPedidoWebCompletado(orderNumber) {
+  Swal.fire({ title: 'Completar Pedido', text: '¿Marcar este pedido como completado?', icon: 'question', showCancelButton: true, confirmButtonColor: '#48bb78', confirmButtonText: 'Sí' }).then(res => {
+    if(res.isConfirmed) {
+      cargarDatosWeb();
+      const idx = webData.pedidos.findIndex(p => p.orderNumber === orderNumber);
+      if(idx !== -1) {
+        webData.pedidos[idx].estado = 'completado';
+        localStorage.setItem('friofantasy_webhook_data', JSON.stringify(webData));
+        const pedido = webData.pedidos[idx];
+        // Actualizar en Firebase también
+        marcarPedidoCompletadoFirebase(orderNumber, pedido.firebaseKey || null);
+        appData.orders.unshift({ id: Date.now(), orderNumber: pedido.orderNumber + '-SYS', date: new Date().toLocaleString(), clientName: pedido.cliente_nombre || 'Cliente Web', cliente_email: pedido.cliente_email || '', cliente_telefono: pedido.cliente_telefono || '', direccion: pedido.direccion || '', rnc: '', subtotal: pedido.subtotal || 0, tax: pedido.itbis || 0, total: pedido.total || 0, status: 'Completado', items: (pedido.items || []).map(i => ({ name: i.nombre || i.name, qty: i.cantidad || 1, price: i.precio_unitario || 0, size: i.size || 'Regular', customization: i.customization || null })), cashier: currentUser.name, metodo_pago: pedido.metodo_pago || 'No especificado', delivery_type: pedido.delivery_type || 'pickup', origen: 'web' });
+        saveData();
+        Swal.fire('Completado', 'Pedido marcado como completado', 'success');
+        if(document.getElementById('moduleContent').innerHTML.includes('Pedidos')) loadModule('orders'); else loadModule('webdata');
+      }
+    }
+  });
+}
+
+function syncWebData() { cargarDatosWeb(); Swal.fire('Sincronizado', 'Datos actualizados', 'success'); renderWebData(); }
+
+// Simular notificación de prueba (para demostración)
+function simularNuevoPedidoWeb() {
+  const nuevoPedido = {
+    tipo: 'pedido',
+    datos: {
+      orderNumber: `WEB-${Date.now()}`,
+      cliente_nombre: 'Cliente Demo ' + new Date().toLocaleTimeString(),
+      cliente_email: 'demo@email.com',
+      cliente_telefono: '809-555-0000',
+      direccion: 'Calle Demo #123',
+      subtotal: 350,
+      itbis: 63,
+      total: 413,
+      items: [{ nombre: 'Helado Vainilla', cantidad: 2, precio_unitario: 35 }, { nombre: 'Cono Doble', cantidad: 1, precio_unitario: 45 }],
+      delivery_type: 'delivery',
+      metodo_pago: 'Tarjeta',
+      fecha_registro: new Date().toLocaleString(),
+      estado: 'pendiente'
+    }
+  };
+  webData.pedidos.unshift(nuevoPedido.datos);
+  localStorage.setItem('friofantasy_webhook_data', JSON.stringify(webData));
+  agregarNotificacionWeb(nuevoPedido);
+  if (currentUser && document.getElementById('moduleContent').innerHTML.includes('Datos de la Web')) renderWebData();
+  if (currentUser && document.getElementById('moduleContent').innerHTML.includes('Pedidos')) loadModule('orders');
+  Swal.fire({ title: 'Notificación de prueba', text: 'Se ha simulado un nuevo pedido web', icon: 'success', timer: 2000, showConfirmButton: false });
+}
+
+// ======================== MÓDULO PEDIDOS ========================
+function renderOrders() {
+  cargarDatosWeb();
+  const pedidosWeb = webData.pedidos || [];
+  if(appData.orders.length === 0 && pedidosWeb.length === 0) return '<div class="text-center py-20"><div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 shadow-xl gradient-bg"><i class="fas fa-truck text-white text-4xl"></i></div><p class="text-gray-500 text-lg">No hay pedidos registrados</p><button onclick="simularNuevoPedidoWeb()" class="mt-4 btn-primary"><i class="fas fa-plus mr-2"></i>Simular pedido de prueba</button></div>';
+  let html = `<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><div class="flex justify-between items-center mb-6"><div><h2 class="text-2xl font-bold gradient-text">Pedidos</h2><p class="text-sm" style="color:var(--gray-600);">Gestiona pedidos (incluye web)</p></div><button onclick="simularNuevoPedidoWeb()" class="px-4 py-2 rounded-xl text-sm font-semibold" style="background:#ed8936;color:white;border:none;cursor:pointer;"><i class="fas fa-plus mr-1"></i> Simular pedido</button></div><div class="space-y-4">`;
+  for(var order of appData.orders) {
+    const statusColor = order.status === 'Pendiente' ? '#ed8936' : (order.status === 'Completado' ? '#48bb78' : '#f56565');
+    let prodResumen = ''; for(var item of order.items) prodResumen += `<div class="text-xs" style="color:var(--gray-600);">• ${item.qty}x ${escapeHtml(item.name)}${item.size ? ` (${item.size})` : ''}</div>`;
+    html += `<div class="stat-card"><div class="flex justify-between items-start flex-wrap gap-4"><div class="flex-1"><div class="flex items-center gap-3 mb-2 flex-wrap"><span class="text-2xl font-bold" style="color:#ed8936;">#${order.orderNumber}</span><span class="px-3 py-1 rounded-full text-xs" style="background:${statusColor}20;color:${statusColor};">${order.status}</span>${order.origen === 'web' ? '<span class="web-data-badge">Web</span>' : '<span class="px-2 py-1 rounded-full text-xs" style="background:#667eea20;color:#667eea;">Sistema</span>'}</div><p><i class="fas fa-user mr-2"></i>${escapeHtml(order.clientName)}</p><p class="text-sm"><i class="fas fa-calendar mr-2"></i>${order.date}</p><div class="mt-2 p-2 rounded-lg" style="background:var(--gray-100);"><p class="text-xs font-semibold">Productos:</p>${prodResumen}</div></div><div class="text-right"><p class="text-2xl font-bold" style="color:#ed8936;">${formatCurrency(order.total)}</p><div class="flex gap-2 mt-2"><button onclick="imprimirFactura(${order.id}, 'pedido')" class="px-3 py-1 text-xs rounded-lg" style="background:#667eea;color:white;border:none;cursor:pointer;"><i class="fas fa-print"></i> Imprimir</button><button onclick="viewOrder(${order.id})" class="px-3 py-1 text-xs rounded-lg" style="background:#ed8936;color:white;border:none;cursor:pointer;"><i class="fas fa-eye"></i> Ver</button>${order.status === 'Pendiente' ? `<button onclick="completeOrder(${order.id})" class="px-3 py-1 text-xs rounded-lg" style="background:#48bb78;color:white;border:none;cursor:pointer;"><i class="fas fa-check-circle"></i> Completar</button>` : ''}</div></div></div></div>`;
+  }
+  for(var pedidoWeb of pedidosWeb) {
+    const statusColor = pedidoWeb.estado === 'pendiente' ? '#ed8936' : '#48bb78', statusText = pedidoWeb.estado === 'pendiente' ? 'Pendiente' : 'Completado';
+    let prodResumen = ''; if(pedidoWeb.items && pedidoWeb.items.length) for(var iw of pedidoWeb.items) prodResumen += `<div class="text-xs" style="color:var(--gray-600);">• ${iw.cantidad || 1}x ${escapeHtml(iw.nombre || 'Producto')}${iw.size ? ` (${iw.size})` : ''}${iw.customization ? `<br><span class="text-xs italic">${iw.customization}</span>` : ''}</div>`;
+    html += `<div class="stat-card" style="border-left:4px solid #48bb78;"><div class="flex justify-between items-start flex-wrap gap-4"><div class="flex-1"><div class="flex items-center gap-3 mb-2 flex-wrap"><span class="text-2xl font-bold" style="color:#48bb78;">${pedidoWeb.orderNumber || 'WEB-' + pedidoWeb.id}</span><span class="web-data-badge">Web</span><span class="px-3 py-1 rounded-full text-xs" style="background:${statusColor}20;color:${statusColor};">${statusText}</span></div><p><i class="fas fa-user mr-2"></i>${escapeHtml(pedidoWeb.cliente_nombre || 'Cliente Web')}</p><p class="text-sm"><i class="fas fa-calendar mr-2"></i>${pedidoWeb.fecha_registro || pedidoWeb.fecha || 'N/A'}</p><p class="text-sm"><i class="fas fa-phone mr-2"></i>${escapeHtml(pedidoWeb.cliente_telefono || 'N/A')}</p>${pedidoWeb.direccion && pedidoWeb.direccion !== 'Recoger en tienda' ? `<p class="text-sm"><i class="fas fa-map-marker-alt mr-2"></i>${escapeHtml(pedidoWeb.direccion)}</p>` : ''}<div class="mt-2 p-2 rounded-lg" style="background:var(--gray-100);"><p class="text-xs font-semibold">Productos:</p>${prodResumen || '<div class="text-xs text-gray-500">No hay productos detallados</div>'}</div></div><div class="text-right"><p class="text-2xl font-bold" style="color:#48bb78;">${formatCurrency(pedidoWeb.total || 0)}</p><div class="flex gap-2 mt-2"><button onclick="imprimirFactura('${pedidoWeb.orderNumber}', 'pedidoWeb')" class="px-3 py-1 text-xs rounded-lg" style="background:#667eea;color:white;border:none;cursor:pointer;"><i class="fas fa-print"></i> Imprimir</button><button onclick="verPedidoWeb('${pedidoWeb.orderNumber}')" class="px-3 py-1 text-xs rounded-lg" style="background:#ed8936;color:white;border:none;cursor:pointer;"><i class="fas fa-eye"></i> Ver</button>${pedidoWeb.estado !== 'completado' ? `<button onclick="marcarPedidoWebCompletado('${pedidoWeb.orderNumber}')" class="px-3 py-1 text-xs rounded-lg" style="background:#48bb78;color:white;border:none;cursor:pointer;"><i class="fas fa-check-circle"></i> Completar</button>` : ''}</div></div></div></div>`;
+  }
+  html += `</div></div></div>`;
+  return html;
+}
+
+function viewOrder(id) {
+  const order = appData.orders.find(o => o.id === id);
+  if(!order) return;
+  let itemsHtml = ''; for(var item of order.items) itemsHtml += `<div class="flex justify-between text-sm py-1"><span>${item.qty}x ${escapeHtml(item.name)}${item.size ? ` (${item.size})` : ''}${item.customization ? `<br><span class="text-xs italic">${item.customization}</span>` : ''}</span><span>${formatCurrency(item.price * item.qty)}</span></div>`;
+  Swal.fire({ title: `Pedido #${order.orderNumber}`, html: `<div class="text-left"><div class="p-4 rounded-xl mb-4" style="background:var(--gray-100);"><p><strong>Cliente:</strong> ${escapeHtml(order.clientName)}</p><p><strong>RNC:</strong> ${escapeHtml(order.rnc) || 'Consumidor Final'}</p><p><strong>Fecha:</strong> ${order.date}</p><p><strong>Estado:</strong> <span style="color:${order.status==='Pendiente'?'#ed8936':'#48bb78'}">${order.status}</span></p></div><p class="font-bold mb-2">Productos:</p>${itemsHtml}<div class="border-t mt-4 pt-4"><div class="flex justify-between"><span>Subtotal:</span><span>${formatCurrency(order.subtotal)}</span></div><div class="flex justify-between"><span>ITBIS (${systemConfig.itbisRate}%):</span><span>${formatCurrency(order.tax)}</span></div><div class="flex justify-between text-xl font-bold mt-2" style="color:#ed8936;"><span>TOTAL:</span><span>${formatCurrency(order.total)}</span></div></div></div>`, width: 500, confirmButtonColor: '#ed8936', showCancelButton: true, cancelButtonText: '🖨️ Imprimir', cancelButtonColor: '#667eea', didOpen: () => { const cancelBtn = document.querySelector('.swal2-cancel'); if(cancelBtn) cancelBtn.onclick = () => { Swal.close(); imprimirFactura(id, 'pedido'); }; } });
+}
+
+function completeOrder(id) {
+  Swal.fire({ title: 'Completar Pedido', text: '¿Marcar como completado?', icon: 'question', showCancelButton: true, confirmButtonColor: '#48bb78', confirmButtonText: 'Sí' }).then(res => { if(res.isConfirmed) { const order = appData.orders.find(o => o.id === id); if(order) { order.status = 'Completado'; saveData(); loadModule('orders'); Swal.fire('Completado', '', 'success'); } } });
+}
+
+// ======================== MÓDULO POS ========================
+function renderPOS() {
+  if(appData.products.length === 0) return '<div class="animate-fade-up text-center py-20"><div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 shadow-xl gradient-bg"><i class="fas fa-ice-cream text-white text-4xl"></i></div><p class="text-gray-500 text-lg mb-2">No hay productos en el inventario</p><p class="text-gray-400 text-sm mb-6">Agrega productos primero para poder realizar ventas</p><button onclick="loadModule(\'inventory\')" class="btn-primary"><i class="fas fa-boxes mr-2"></i>Ir al Inventario</button></div>';
+  let productsOptions = '<option value="">-- Seleccionar Producto --</option>'; for(var p of appData.products) productsOptions += `<option value="${p.id}">${p.name} - ${formatCurrency(p.price)} (Stock: ${p.stock})</option>`;
+  let customersOptions = '<option value="">-- Seleccionar Cliente --</option>'; for(var c of appData.customers) customersOptions += `<option value="${c.id}">${c.name} - ${c.rnc}</option>`;
+  setTimeout(() => { updateCartUI(); renderLastSales(); }, 100);
+  return `<div class="animate-fade-up"><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2"><div class="glass-card rounded-2xl p-6 shadow-xl"><div class="flex items-center gap-3 mb-6"><div class="w-12 h-12 rounded-xl flex items-center justify-center gradient-bg"><i class="fas fa-shopping-cart text-white text-xl"></i></div><div><h2 class="text-2xl font-bold gradient-text">Carrito de Compras</h2><p class="text-sm" style="color:var(--gray-600);">Agrega productos y procesa ventas</p></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><select id="productSelect" class="input-premium">${productsOptions}</select><button onclick="addToCart()" class="btn-primary"><i class="fas fa-plus mr-2"></i>Agregar</button></div><div id="invoiceCustomerDiv" class="mb-6"><label class="form-label">Cliente</label><select id="customerSelect" class="input-premium">${customersOptions}</select></div><div class="bg-gray-50 rounded-2xl p-4 max-h-96 overflow-y-auto mb-6" id="cartItemsContainer"><div class="text-center text-gray-400 py-12"><i class="fas fa-shopping-cart text-5xl mb-3"></i><p>Carrito vacío</p></div></div><div class="border-t pt-6 space-y-3"><div class="flex justify-between text-lg"><span>Subtotal:</span><span id="subtotal" class="font-semibold">RD$ 0.00</span></div><div class="flex justify-between text-lg"><span>ITBIS (${systemConfig.itbisRate}%):</span><span id="tax" class="font-semibold">RD$ 0.00</span></div><div class="flex justify-between text-3xl font-bold pt-2 border-t gradient-text"><span>TOTAL:</span><span id="total">RD$ 0.00</span></div><div class="grid grid-cols-2 gap-4 mt-4"><select id="paymentMethod" class="input-premium"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option></select><input type="number" id="cashReceived" placeholder="Monto recibido" class="input-premium"></div><div class="grid grid-cols-3 gap-3 mt-4"><button onclick="processSaleWithInvoice()" class="btn-primary"><i class="fas fa-file-invoice mr-1"></i>Facturar</button><button onclick="processSaleWithoutInvoice()" class="btn-secondary"><i class="fas fa-receipt mr-1"></i>Ticket</button><button onclick="createOrderFromCart()" class="py-3 rounded-xl font-semibold" style="background:#ed8936;color:white;border:none;cursor:pointer;"><i class="fas fa-truck mr-1"></i>Pedido</button></div></div></div></div><div class="space-y-6"><div class="rounded-2xl p-6 text-white shadow-xl gradient-bg"><i class="fas fa-chart-line text-4xl mb-3"></i><p class="text-white/80 text-sm">Efectivo en Caja</p><p class="text-4xl font-bold">${formatCurrency(appData.cashSessions.currentCash)}</p><p class="text-white/60 text-xs mt-2">ITBIS: ${systemConfig.itbisRate}%</p></div><div class="glass-card rounded-2xl p-6 shadow-xl"><h3 class="font-bold text-lg mb-4"><i class="fas fa-history" style="color:var(--primary);"></i> Últimas Ventas</h3><div id="lastSales" class="space-y-2 max-h-96 overflow-y-auto"></div></div></div></div></div>`;
+}
+
+function createOrderFromCart() {
+  if(currentCart.length === 0) { Swal.fire('Error', 'Carrito vacío', 'warning'); return false; }
+  const subt = currentCart.reduce((s,i) => s + i.price * i.qty, 0), tax = subt * (systemConfig.itbisRate / 100), total = subt + tax;
+  const customerSelect = document.getElementById('customerSelect'), client = (customerSelect && customerSelect.value) ? appData.customers.find(c => c.id === parseInt(customerSelect.value)) : null;
+  appData.orders.unshift({ id: Date.now(), orderNumber: appData.nextOrderId++, date: getCurrentDateTime(), clientName: client ? client.name : 'Consumidor Final', rnc: client ? client.rnc : '', subtotal: subt, tax: tax, total: total, status: 'Pendiente', items: currentCart.map(i => ({ name: i.name, qty: i.qty, price: i.price })), createdBy: currentUser.name });
+  saveData();
+  Swal.fire({ title: 'Pedido Creado', html: `<p class="text-2xl font-bold text-amber-500">#${appData.nextOrderId-1}</p><p>Total: ${formatCurrency(total)}</p>`, icon: 'success', confirmButtonColor: '#ed8936' });
+  currentCart = []; updateCartUI(); loadModule('orders'); return true;
+}
+
+function addToCart() {
+  const sel = document.getElementById('productSelect'); if(!sel || !sel.value) { Swal.fire('Error', 'Selecciona un producto', 'warning'); return; }
+  const id = safeParseInt(sel.value), prod = appData.products.find(p => p.id === id);
+  if(prod && prod.stock > 0) {
+    const exist = currentCart.find(i => i.id === id);
+    if(exist && exist.qty + 1 > prod.stock) { Swal.fire('Stock insuficiente', `Solo hay ${prod.stock} unidades`, 'warning'); return; }
+    if(exist) exist.qty++; else { const newItem = JSON.parse(JSON.stringify(prod)); newItem.qty = 1; currentCart.push(newItem); }
+    updateCartUI(); Swal.fire({ title: 'Agregado', text: `${prod.name} agregado al carrito`, icon: 'success', timer: 1000, showConfirmButton: false });
+  } else Swal.fire('Sin stock', 'Producto no disponible', 'error');
+  sel.value = '';
+}
+
+function updateCartUI() {
+  let subt = 0; for(var item of currentCart) subt += item.price * item.qty;
+  const tax = subt * (systemConfig.itbisRate / 100), total = subt + tax;
+  const subtEl = document.getElementById('subtotal'), taxEl = document.getElementById('tax'), totalEl = document.getElementById('total');
+  if(subtEl) subtEl.innerHTML = formatCurrency(subt); if(taxEl) taxEl.innerHTML = formatCurrency(tax); if(totalEl) totalEl.innerHTML = formatCurrency(total);
+  const container = document.getElementById('cartItemsContainer');
+  if(container) {
+    if(currentCart.length === 0) container.innerHTML = '<div class="text-center text-gray-400 py-12"><i class="fas fa-shopping-cart text-5xl mb-3"></i><p>Carrito vacío</p></div>';
+    else { let html = ''; for(var item of currentCart) { html += `<div class="cart-item-premium"><div class="flex justify-between items-center"><div class="flex-1"><p class="font-medium">${escapeHtml(item.name)}</p><p class="text-xs">${formatCurrency(item.price)} c/u</p></div><div class="flex items-center gap-2"><button onclick="changeQty(${item.id}, -1)" class="w-8 h-8 rounded-full flex items-center justify-center" style="background:var(--gray-100);color:var(--gray-600);border:none;cursor:pointer;">-</button><span class="w-8 text-center font-semibold">${item.qty}</span><button onclick="changeQty(${item.id}, 1)" class="w-8 h-8 rounded-full flex items-center justify-center" style="background:var(--gray-100);color:var(--gray-600);border:none;cursor:pointer;">+</button></div><div class="w-28 text-right font-semibold">${formatCurrency(item.price * item.qty)}</div><button onclick="removeItem(${item.id})" class="ml-2 text-red-400 hover:text-red-600" style="background:none;border:none;cursor:pointer;"><i class="fas fa-trash"></i></button></div></div>`; } container.innerHTML = html; }
+  }
+}
+
+function changeQty(id, delta) { for(var i=0;i<currentCart.length;i++) { if(currentCart[i].id === id) { let newQty = currentCart[i].qty + delta; if(newQty <= 0) currentCart.splice(i,1); else { const prod = appData.products.find(p => p.id === id); if(delta > 0 && newQty > (prod ? prod.stock : 0)) { Swal.fire('Stock insuficiente', `Solo hay ${prod.stock} unidades`, 'warning'); return; } currentCart[i].qty = newQty; } updateCartUI(); return; } } }
+function removeItem(id) { currentCart = currentCart.filter(i => i.id !== id); updateCartUI(); }
+function processSale(isInvoice) {
+  if(currentCart.length === 0) { Swal.fire('Error', 'Carrito vacío', 'warning'); return false; }
+  for(var item of currentCart) { const prod = appData.products.find(p => p.id === item.id); if(prod.stock < item.qty) { Swal.fire('Stock insuficiente', `No hay suficiente stock de ${prod.name}`, 'error'); return false; } }
+  const subt = currentCart.reduce((s,i) => s + i.price * i.qty, 0), tax = subt * (systemConfig.itbisRate / 100), total = subt + tax;
+  const paymentMethod = document.getElementById('paymentMethod')?.value || 'Efectivo', cashReceived = safeParseFloat(document.getElementById('cashReceived')?.value);
+  if(paymentMethod === 'Efectivo' && cashReceived < total) { Swal.fire('Error', 'Monto insuficiente', 'error'); return false; }
+  const change = (paymentMethod === 'Efectivo') ? cashReceived - total : 0;
+  let client = null; if(isInvoice) { const customerSelect = document.getElementById('customerSelect'); if(customerSelect && customerSelect.value) client = appData.customers.find(c => c.id === parseInt(customerSelect.value)); }
+  const saleRecord = { id: Date.now(), date: getCurrentDateTime(), clientName: isInvoice ? (client ? client.name : 'Consumidor Final') : 'VENTA SIN FACTURA', rnc: isInvoice ? (client ? client.rnc : '') : '', subtotal: subt, tax: tax, total: total, paymentMethod: paymentMethod, change: change, items: currentCart.map(i => ({ name: i.name, qty: i.qty, price: i.price })), cashier: currentUser.name };
+  if(isInvoice) { saleRecord.invoiceNumber = appData.nextInvoiceId++; saleRecord.status = "Pagada"; appData.invoices.unshift(saleRecord); }
+  else { saleRecord.ticketNumber = appData.nextTicketId++; appData.salesWithoutInvoice.unshift(saleRecord); }
+  for(var item of currentCart) { const prod = appData.products.find(p => p.id === item.id); if(prod) prod.stock -= item.qty; }
+  appData.cashSessions.currentCash += total; saveData();
+  Swal.fire({ title: 'Venta Completada', html: `<div class="text-center"><div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 gradient-bg"><i class="fas fa-check text-white text-3xl"></i></div><p class="text-2xl font-bold gradient-text">${isInvoice ? 'Factura' : 'Ticket'} #${isInvoice ? saleRecord.invoiceNumber : saleRecord.ticketNumber}</p><p class="text-xl font-bold mt-2">${formatCurrency(total)}</p>${change > 0 ? `<p class="text-green-600 mt-2">Cambio: ${formatCurrency(change)}</p>` : ''}</div>`, icon: 'success', confirmButtonColor: '#667eea', background: 'white', borderRadius: '24px' });
+  currentCart = []; updateCartUI(); loadModule('pos'); return true;
+}
+function processSaleWithInvoice() { processSale(true); }
+function processSaleWithoutInvoice() { processSale(false); }
+function renderLastSales() {
+  const container = document.getElementById('lastSales'); if(!container) return;
+  const allSales = [...appData.invoices].sort((a,b) => new Date(b.date) - new Date(a.date));
+  let html = ''; for(var i=0;i<Math.min(5,allSales.length);i++) { const s = allSales[i]; html += `<div class="p-3 rounded-xl" style="background:var(--gray-100);"><div class="flex justify-between items-center"><div><span class="font-semibold gradient-text">#${s.invoiceNumber}</span><p class="text-xs">${s.clientName.substring(0,20)}</p></div><span class="font-bold">${formatCurrency(s.total)}</span></div></div>`; }
+  container.innerHTML = html || '<div class="text-center text-gray-400">Sin ventas recientes</div>';
+}
+
+// ======================== OTROS MÓDULOS BÁSICOS ========================
+function renderInventory() {
+  if(appData.products.length === 0) return '<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><div class="flex justify-between items-center mb-6"><div><h2 class="text-2xl font-bold gradient-text">Inventario</h2><p class="text-sm">Gestiona productos de helados</p></div><button onclick="showCreateProduct()" class="btn-primary"><i class="fas fa-plus mr-2"></i>Nuevo Producto</button></div><div class="text-center py-16"><div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 shadow-xl gradient-bg"><i class="fas fa-ice-cream text-white text-4xl"></i></div><p class="text-gray-500 text-lg mb-4">No hay productos en el inventario</p><button onclick="showCreateProduct()" class="btn-primary"><i class="fas fa-plus mr-2"></i>Crear primer producto</button></div></div></div>';
+  let html = `<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><div class="flex justify-between items-center mb-6"><div><h2 class="text-2xl font-bold gradient-text">Inventario</h2><p class="text-sm">Gestiona productos</p></div><button onclick="showCreateProduct()" class="btn-primary"><i class="fas fa-plus mr-2"></i>Nuevo Producto</button></div><div class="overflow-x-auto"><table class="data-table"><thead><tr><th>SKU</th><th>Producto</th><th>Stock</th><th>Precio</th><th>Acciones</th></tr></thead><tbody>`;
+  for(var p of appData.products) { let stockBadge = p.stock <= 0 ? '<span class="badge-stock-out">Agotado</span>' : (p.stock <= p.minStock ? '<span class="badge-stock-low">Stock Bajo</span>' : '<span class="badge-stock-high">En Stock</span>'); html += `<tr><td class="font-mono text-sm">${escapeHtml(p.sku)}</td><td><span class="font-medium">${escapeHtml(p.name)}</span></td><td><div class="flex items-center gap-2"><span class="font-semibold">${p.stock}</span>${stockBadge}</div></td><td><span class="font-semibold gradient-text">${formatCurrency(p.price)}</span></td><td><div class="flex gap-2"><button onclick="editProduct(${p.id})" class="px-3 py-1 rounded-lg" style="background:#4299e1;color:white;border:none;"><i class="fas fa-edit"></i></button><button onclick="deleteProduct(${p.id})" class="px-3 py-1 rounded-lg" style="background:#f56565;color:white;border:none;"><i class="fas fa-trash"></i></button></div></td></tr>`; }
+  html += `</tbody></table></div></div></div>`; return html;
+}
+function showCreateProduct() { Swal.fire({ title: 'Nuevo Producto', html: `<div class="space-y-3"><input id="prodName" placeholder="Nombre" class="input-premium w-full"><input id="prodPrice" type="number" step="0.01" placeholder="Precio" class="input-premium w-full"><input id="prodStock" type="number" placeholder="Stock inicial" class="input-premium w-full"><input id="prodMinStock" type="number" placeholder="Stock mínimo" class="input-premium w-full"></div>`, showCancelButton: true, confirmButtonText: 'Crear', preConfirm: () => { const name = document.getElementById('prodName')?.value, price = safeParseFloat(document.getElementById('prodPrice')?.value), stock = safeParseInt(document.getElementById('prodStock')?.value), minStock = safeParseInt(document.getElementById('prodMinStock')?.value) || 5; if(!name || price <= 0) { Swal.showValidationMessage('Nombre y precio requeridos'); return false; } const newId = getNextId(appData.products); appData.products.push({ id: newId, sku: 'PRO-' + String(newId).padStart(3,'0'), name, price, stock, minStock, barcode: '' }); saveData(); loadModule('inventory'); Swal.fire('Creado', 'Producto agregado', 'success'); } }); }
+function editProduct(id) { const p = appData.products.find(prod => prod.id === id); if(!p) return; Swal.fire({ title: 'Editar Producto', html: `<div class="space-y-3"><input id="pName" value="${escapeHtml(p.name)}" class="input-premium w-full"><input id="pPrice" value="${p.price}" type="number" step="0.01" class="input-premium w-full"><input id="pStock" value="${p.stock}" type="number" class="input-premium w-full"><input id="pMinStock" value="${p.minStock}" type="number" class="input-premium w-full"></div>`, showCancelButton: true, confirmButtonText: 'Guardar', preConfirm: () => { p.name = document.getElementById('pName')?.value; p.price = safeParseFloat(document.getElementById('pPrice')?.value); p.stock = safeParseInt(document.getElementById('pStock')?.value); p.minStock = safeParseInt(document.getElementById('pMinStock')?.value); saveData(); loadModule('inventory'); Swal.fire('Actualizado', 'Producto modificado', 'success'); } }); }
+function deleteProduct(id) { Swal.fire({ title: 'Eliminar', text: '¿Eliminar producto?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#f56565', confirmButtonText: 'Sí' }).then(res => { if(res.isConfirmed) { appData.products = appData.products.filter(p => p.id !== id); saveData(); loadModule('inventory'); Swal.fire('Eliminado', '', 'success'); } }); }
+
+function renderCustomers() {
+  cargarDatosWeb();
+  const clientesWeb = webData.clientes || [];
+  let html = `<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><div class="flex justify-between items-center mb-6"><div><h2 class="text-2xl font-bold gradient-text">Clientes</h2><p class="text-sm">Incluye clientes de la web</p></div><button onclick="showCreateCustomer()" class="btn-primary"><i class="fas fa-user-plus mr-2"></i>Nuevo Cliente</button></div><div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+  for(var c of appData.customers) { html += `<div class="stat-card"><div class="flex items-center gap-3 mb-3"><div class="w-12 h-12 rounded-full flex items-center justify-center gradient-bg"><i class="fas fa-user text-white"></i></div><div><h3 class="font-bold">${escapeHtml(c.name)}</h3><p class="text-xs">${c.rnc || 'Sin RNC'}</p></div></div><div class="space-y-2 text-sm"><p><i class="fas fa-phone w-5"></i> ${c.phone || 'No registrado'}</p><p><i class="fas fa-map-marker-alt w-5"></i> ${c.address || 'Sin dirección'}</p></div><div class="mt-4 pt-3 flex gap-2" style="border-top:1px solid var(--gray-200);"><button onclick="editCustomer(${c.id})" class="flex-1 py-2 rounded-lg" style="background:#4299e1;color:white;border:none;"><i class="fas fa-edit"></i> Editar</button><button onclick="deleteCustomer(${c.id})" class="flex-1 py-2 rounded-lg" style="background:#f56565;color:white;border:none;"><i class="fas fa-trash"></i> Eliminar</button></div></div>`; }
+  for(var cw of clientesWeb) { html += `<div class="stat-card" style="border-left:4px solid #48bb78;"><div class="flex items-center gap-3 mb-3"><div class="w-12 h-12 rounded-full flex items-center justify-center" style="background:linear-gradient(135deg,#48bb78,#68d391);"><i class="fas fa-globe text-white"></i></div><div><h3 class="font-bold">${escapeHtml(cw.nombre || 'Cliente Web')}</h3><p class="text-xs">${escapeHtml(cw.email || 'Sin email')}</p></div></div><div class="space-y-2 text-sm"><p><i class="fas fa-phone w-5"></i> ${cw.telefono || 'No registrado'}</p><p><i class="fas fa-calendar w-5"></i> Registro: ${cw.fecha_registro || 'N/A'}</p></div><div class="mt-4"><span class="web-data-badge">Cliente Web</span></div></div>`; }
+  if(appData.customers.length === 0 && clientesWeb.length === 0) html += `<div class="col-span-full text-center py-12"><div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 gradient-bg shadow-lg"><i class="fas fa-users text-white text-3xl"></i></div><p class="text-gray-500 text-lg mb-2">No hay clientes registrados</p><button onclick="showCreateCustomer()" class="btn-primary mt-2"><i class="fas fa-user-plus mr-2"></i>Agregar primer cliente</button></div>`;
+  html += `</div></div></div>`; return html;
+}
+function showCreateCustomer() { Swal.fire({ title: 'Nuevo Cliente', html: `<div class="space-y-3"><input id="cName" placeholder="Nombre" class="input-premium w-full"><input id="cRnc" placeholder="RNC/Cédula" class="input-premium w-full"><input id="cPhone" placeholder="Teléfono" class="input-premium w-full"><input id="cAddress" placeholder="Dirección" class="input-premium w-full"></div>`, showCancelButton: true, confirmButtonText: 'Crear', preConfirm: () => { const name = document.getElementById('cName')?.value; if(!name) { Swal.showValidationMessage('Nombre requerido'); return false; } const newId = getNextId(appData.customers); appData.customers.push({ id: newId, name, rnc: document.getElementById('cRnc')?.value || '', phone: document.getElementById('cPhone')?.value || '', address: document.getElementById('cAddress')?.value || '', points: 0 }); saveData(); loadModule('customers'); Swal.fire('Creado', 'Cliente agregado', 'success'); } }); }
+function editCustomer(id) { const c = appData.customers.find(cli => cli.id === id); if(!c) return; Swal.fire({ title: 'Editar Cliente', html: `<div class="space-y-3"><input id="cName" value="${escapeHtml(c.name)}" class="input-premium w-full"><input id="cRnc" value="${escapeHtml(c.rnc)}" class="input-premium w-full"><input id="cPhone" value="${escapeHtml(c.phone)}" class="input-premium w-full"><input id="cAddress" value="${escapeHtml(c.address)}" class="input-premium w-full"></div>`, showCancelButton: true, confirmButtonText: 'Guardar', preConfirm: () => { c.name = document.getElementById('cName')?.value; c.rnc = document.getElementById('cRnc')?.value; c.phone = document.getElementById('cPhone')?.value; c.address = document.getElementById('cAddress')?.value; saveData(); loadModule('customers'); Swal.fire('Actualizado', 'Cliente modificado', 'success'); } }); }
+function deleteCustomer(id) { Swal.fire({ title: 'Eliminar', text: '¿Eliminar cliente?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#f56565', confirmButtonText: 'Sí' }).then(res => { if(res.isConfirmed) { appData.customers = appData.customers.filter(c => c.id !== id); saveData(); loadModule('customers'); Swal.fire({ title: 'Eliminado', text: 'Cliente eliminado correctamente', icon: 'success', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' }); } }); }
+
+function renderInvoicesHistory() {
+  if(appData.invoices.length === 0) return '<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><h2 class="text-2xl font-bold gradient-text mb-6">Historial de Facturas</h2><div class="text-center py-16"><div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 shadow-xl gradient-bg"><i class="fas fa-file-invoice text-white text-4xl"></i></div><p class="text-gray-500 text-lg mb-2">No hay facturas emitidas</p><p class="text-gray-400 text-sm mb-6">Las facturas aparecerán aquí cuando proceses ventas en el POS</p><button onclick="loadModule(\'pos\')" class="btn-primary"><i class="fas fa-cash-register mr-2"></i>Ir al Punto de Venta</button></div></div></div>';
+  let html = `<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><h2 class="text-2xl font-bold gradient-text mb-6">Historial de Facturas</h2><div class="space-y-4">`;
+  for(var inv of appData.invoices) { html += `<div class="stat-card"><div class="flex justify-between items-start flex-wrap gap-4"><div><div class="flex items-center gap-3 mb-2"><span class="text-2xl font-bold gradient-text">#${inv.invoiceNumber}</span><span class="px-3 py-1 rounded-full text-xs" style="background:#d1fae5;color:#065f46;">${inv.status || 'Pagada'}</span></div><p><i class="fas fa-user mr-2"></i>${escapeHtml(inv.clientName)}</p><p class="text-sm"><i class="fas fa-calendar mr-2"></i>${inv.date}</p></div><div class="text-right"><p class="text-2xl font-bold gradient-text">${formatCurrency(inv.total)}</p><p class="text-sm"><i class="fas fa-credit-card"></i> ${inv.paymentMethod}</p><button onclick="viewInvoice(${inv.id})" class="mt-2 text-sm font-medium" style="color:var(--primary);background:none;border:none;"><i class="fas fa-eye"></i> Ver Detalles</button></div></div></div>`; }
+  html += `</div></div></div>`; return html;
+}
+function viewInvoice(id) { const inv = appData.invoices.find(i => i.id === id); if(!inv) return; let itemsHtml = '<div class="space-y-2 max-h-60 overflow-y-auto">'; for(var item of inv.items) itemsHtml += `<div class="flex justify-between text-sm py-1"><span>${item.qty}x ${escapeHtml(item.name)}</span><span>${formatCurrency(item.price * item.qty)}</span></div>`; itemsHtml += '</div>'; Swal.fire({ title: `<i class="fas fa-file-invoice"></i> Factura #${inv.invoiceNumber}`, html: `<div class="text-left"><div class="p-4 rounded-xl mb-4" style="background:var(--gray-100);"><p><strong>Cliente:</strong> ${escapeHtml(inv.clientName)}</p><p><strong>RNC:</strong> ${escapeHtml(inv.rnc) || 'Consumidor Final'}</p><p><strong>Fecha:</strong> ${inv.date}</p><p><strong>Pago:</strong> ${inv.paymentMethod}</p></div><p class="font-bold mb-2">Detalles:</p>${itemsHtml}<div class="border-t mt-4 pt-4"><div class="flex justify-between"><span>Subtotal:</span><span>${formatCurrency(inv.subtotal)}</span></div><div class="flex justify-between"><span>ITBIS (${systemConfig.itbisRate}%):</span><span>${formatCurrency(inv.tax)}</span></div><div class="flex justify-between text-xl font-bold mt-2 gradient-text"><span>TOTAL:</span><span>${formatCurrency(inv.total)}</span></div></div></div>`, width: 500, confirmButtonColor: '#667eea', showCancelButton: true, cancelButtonText: '🖨️ Imprimir', cancelButtonColor: '#667eea', didOpen: () => { const cancelBtn = document.querySelector('.swal2-cancel'); if(cancelBtn) cancelBtn.onclick = () => { Swal.close(); imprimirFactura(id, 'factura'); }; } }); }
+
+function renderUsers() { let html = `<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><div class="flex justify-between items-center mb-6"><div><h2 class="text-2xl font-bold gradient-text">Usuarios</h2><p class="text-sm">Gestiona accesos</p></div><button onclick="showCreateUser()" class="btn-primary"><i class="fas fa-user-plus mr-2"></i>Nuevo Usuario</button></div><div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Permisos</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`; for(var u of appData.users) { const permMap = { pos:'POS',inventory:'Inv',customers:'Cli',invoices_history:'Fact',orders:'Ped',reports:'Rep',cash:'Caja',users:'Usu',config:'Cfg',webdata:'Web' }; const perms = u.permissions.map(p=>permMap[p]||p).join(', '); html += `<tr><td class="font-mono">${escapeHtml(u.username)}</td><td>${escapeHtml(u.name)}</td><td><span class="px-2 py-1 rounded-lg text-xs" style="background:${u.role==='administrador'?'#667eea20':'#48bb7820'};color:${u.role==='administrador'?'#667eea':'#48bb78'};">${u.role==='administrador'?'Admin':'Cajero'}</span></td><td class="text-xs">${perms}</td><td><span class="px-2 py-1 rounded-full text-xs" style="background:${u.active?'#48bb7820':'#f5656520'};color:${u.active?'#48bb78':'#f56565'};">${u.active?'Activo':'Inactivo'}</span></td><td><div class="flex gap-2"><button onclick="editUser(${u.id})" class="px-3 py-1 rounded-lg" style="background:#4299e1;color:white;border:none;"><i class="fas fa-edit"></i></button><button onclick="toggleUserStatus(${u.id})" class="px-3 py-1 rounded-lg" style="background:${u.active?'#f56565':'#48bb78'};color:white;border:none;"><i class="fas ${u.active?'fa-ban':'fa-check'}"></i></button>${u.username!=='admin'?`<button onclick="deleteUser(${u.id})" class="px-3 py-1 rounded-lg" style="background:#f56565;color:white;border:none;"><i class="fas fa-trash"></i></button>`:''}</div></td>`; } html += `</tbody></table></div></div></div>`; return html; }
+function showCreateUser() { Swal.fire({ title: 'Nuevo Usuario', html: `<div class="space-y-3"><input id="userUsername" placeholder="Usuario" class="input-premium"><input id="userPassword" placeholder="Contraseña" type="password" class="input-premium"><input id="userName" placeholder="Nombre" class="input-premium"><select id="userRole" class="input-premium"><option value="cajero">Cajero</option><option value="administrador">Administrador</option></select><div class="permission-group"><p class="permission-group-title">Permisos</p><div><label class="permission-item"><input type="checkbox" value="pos"> POS</label><label class="permission-item"><input type="checkbox" value="inventory"> Inventario</label><label class="permission-item"><input type="checkbox" value="customers"> Clientes</label><label class="permission-item"><input type="checkbox" value="invoices_history"> Facturas</label><label class="permission-item"><input type="checkbox" value="orders"> Pedidos</label><label class="permission-item"><input type="checkbox" value="reports"> Reportes</label><label class="permission-item"><input type="checkbox" value="cash"> Caja</label><label class="permission-item"><input type="checkbox" value="users"> Usuarios</label><label class="permission-item"><input type="checkbox" value="config"> Config</label><label class="permission-item"><input type="checkbox" value="webdata"> Datos Web</label></div></div></div>`, width: '500px', showCancelButton: true, confirmButtonText: 'Crear', preConfirm: () => { const username = document.getElementById('userUsername')?.value, pass = document.getElementById('userPassword')?.value, name = document.getElementById('userName')?.value, role = document.getElementById('userRole')?.value; if(!username||!pass||!name) { Swal.showValidationMessage('Complete todos los campos'); return false; } if(appData.users.find(u=>u.username===username)) { Swal.showValidationMessage('Usuario ya existe'); return false; } let perms = []; document.querySelectorAll('.permission-group input[type="checkbox"]:checked').forEach(cb=>perms.push(cb.value)); if(role==='administrador') perms = ['pos','inventory','customers','invoices_history','orders','reports','cash','users','config','webdata']; if(perms.length===0) { Swal.showValidationMessage('Seleccione al menos un permiso'); return false; } const newId = getNextId(appData.users); appData.users.push({ id: newId, username, password: pass, name, role, permissions: perms, active: true }); saveData(); loadModule('users'); Swal.fire('Creado', 'Usuario agregado', 'success'); } }); }
+function editUser(id) { const user = appData.users.find(u=>u.id===id); if(!user) return; Swal.fire({ title: 'Editar Usuario', html: `<div class="space-y-3"><input id="userUsername" value="${escapeHtml(user.username)}" placeholder="Usuario" class="input-premium" ${user.username==='admin'?'disabled':''}><input id="userPassword" placeholder="Nueva contraseña" type="password" class="input-premium"><input id="userName" value="${escapeHtml(user.name)}" placeholder="Nombre" class="input-premium"><select id="userRole" class="input-premium" ${user.username==='admin'?'disabled':''}><option value="cajero" ${user.role==='cajero'?'selected':''}>Cajero</option><option value="administrador" ${user.role==='administrador'?'selected':''}>Administrador</option></select><div class="permission-group"><p class="permission-group-title">Permisos</p><div><label class="permission-item"><input type="checkbox" value="pos" ${user.permissions.includes('pos')?'checked':''}> POS</label><label class="permission-item"><input type="checkbox" value="inventory" ${user.permissions.includes('inventory')?'checked':''}> Inventario</label><label class="permission-item"><input type="checkbox" value="customers" ${user.permissions.includes('customers')?'checked':''}> Clientes</label><label class="permission-item"><input type="checkbox" value="invoices_history" ${user.permissions.includes('invoices_history')?'checked':''}> Facturas</label><label class="permission-item"><input type="checkbox" value="orders" ${user.permissions.includes('orders')?'checked':''}> Pedidos</label><label class="permission-item"><input type="checkbox" value="reports" ${user.permissions.includes('reports')?'checked':''}> Reportes</label><label class="permission-item"><input type="checkbox" value="cash" ${user.permissions.includes('cash')?'checked':''}> Caja</label><label class="permission-item"><input type="checkbox" value="users" ${user.permissions.includes('users')?'checked':''}> Usuarios</label><label class="permission-item"><input type="checkbox" value="config" ${user.permissions.includes('config')?'checked':''}> Config</label><label class="permission-item"><input type="checkbox" value="webdata" ${user.permissions.includes('webdata')?'checked':''}> Datos Web</label></div></div></div>`, width: '500px', showCancelButton: true, confirmButtonText: 'Guardar', preConfirm: () => { const newPass = document.getElementById('userPassword')?.value, name = document.getElementById('userName')?.value, role = document.getElementById('userRole')?.value; if(!name) { Swal.showValidationMessage('Nombre requerido'); return false; } if(newPass) user.password = newPass; user.name = name; if(user.username!=='admin') user.role = role; if(user.role!=='administrador') { let perms = []; document.querySelectorAll('.permission-group input[type="checkbox"]:checked').forEach(cb=>perms.push(cb.value)); if(perms.length===0) { Swal.showValidationMessage('Seleccione al menos un permiso'); return false; } user.permissions = perms; } else user.permissions = ['pos','inventory','customers','invoices_history','orders','reports','cash','users','config','webdata']; saveData(); loadModule('users'); Swal.fire('Actualizado', 'Usuario modificado', 'success'); } }); }
+function toggleUserStatus(id) { const user = appData.users.find(u=>u.id===id); if(user && user.username!=='admin') { user.active = !user.active; saveData(); loadModule('users'); Swal.fire(user.active?'Usuario activado':'Usuario desactivado', '', 'success'); } else Swal.fire('No se puede', 'No se puede desactivar admin', 'warning'); }
+function deleteUser(id) { const user = appData.users.find(u=>u.id===id); if(user && user.username!=='admin') { Swal.fire({ title: 'Eliminar', text: `¿Eliminar a ${user.name}?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#f56565', confirmButtonText: 'Sí' }).then(res=>{ if(res.isConfirmed) { appData.users = appData.users.filter(u=>u.id!==id); saveData(); loadModule('users'); Swal.fire('Eliminado', '', 'success'); } }); } else Swal.fire('No se puede', 'No se puede eliminar admin', 'warning'); }
+
+function renderReports() {
+  setTimeout(() => { const from = document.getElementById('reportFrom'), to = document.getElementById('reportTo'); if(from && !from.value) { const d = new Date(); d.setDate(1); from.value = d.toISOString().split('T')[0]; } if(to && !to.value) to.value = getCurrentISODate(); filterReports(); }, 100);
+  return `<div class="animate-fade-up"><div class="glass-card rounded-2xl p-6 shadow-xl"><h2 class="text-2xl font-bold gradient-text mb-6">Reportes Financieros</h2><div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8"><div class="stat-card text-center"><i class="fas fa-file-invoice text-3xl mb-2" style="color:#4299e1;"></i><p class="text-xs">Total Facturas</p><p class="text-2xl font-bold" id="statsTotalFacturas">0</p></div><div class="stat-card text-center"><i class="fas fa-chart-line text-3xl mb-2" style="color:#48bb78;"></i><p class="text-xs">Total Ventas</p><p class="text-2xl font-bold" id="statsTotalVentas">RD$ 0</p></div><div class="stat-card text-center"><i class="fas fa-percent text-3xl mb-2" style="color:#9f7aea;"></i><p class="text-xs">Total ITBIS</p><p class="text-2xl font-bold" id="statsTotalITBIS">RD$ 0</p></div><div class="stat-card text-center"><i class="fas fa-chart-simple text-3xl mb-2" style="color:#ed8936;"></i><p class="text-xs">Ticket Promedio</p><p class="text-2xl font-bold" id="statsTicketPromedio">RD$ 0</p></div></div><div class="grid md:grid-cols-2 gap-4 mb-4"><div><label class="form-label">Fecha Desde</label><input type="date" id="reportFrom" class="input-premium" onchange="filterReports()"></div><div><label class="form-label">Fecha Hasta</label><input type="date" id="reportTo" class="input-premium" onchange="filterReports()"></div></div><div class="mb-4"><div class="relative"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="reportSearchInput" placeholder="Buscar..." class="input-premium pl-10" onkeyup="filterReports()"></div></div><div class="flex gap-3 mb-6"><button onclick="exportToExcel()" class="px-5 py-2 rounded-xl font-semibold" style="background:#48bb78;color:white;border:none;"><i class="fas fa-file-excel mr-2"></i>Excel</button><button onclick="exportToPDF()" class="px-5 py-2 rounded-xl font-semibold" style="background:#f56565;color:white;border:none;"><i class="fas fa-file-pdf mr-2"></i>PDF</button><button onclick="clearFilters()" class="px-5 py-2 rounded-xl font-semibold" style="background:#718096;color:white;border:none;"><i class="fas fa-eraser mr-2"></i>Limpiar</button></div><div class="overflow-x-auto border rounded-xl"><table class="data-table"><thead><tr><th>#Factura</th><th>Fecha</th><th>Cliente</th><th>Subtotal</th><th>ITBIS</th><th>Total</th><th>Acciones</th></tr></thead><tbody id="reportTableBody"><tr><td colspan="7" class="text-center p-8" style="color:var(--gray-600);">Cargando...</td></tr></tbody></table></div><div class="mt-4 text-right text-sm" id="reportCountInfo"></div></div></div>`;
+}
+let currentReportData = [], currentReportFiltered = [];
+function filterReports() { const from = document.getElementById('reportFrom')?.value||'', to = document.getElementById('reportTo')?.value||'', search = document.getElementById('reportSearchInput')?.value.toLowerCase()||''; currentReportData = appData.invoices.filter(inv => { const d = formatDateForCompare(inv.date); if(from && d<from) return false; if(to && d>to) return false; return true; }); currentReportFiltered = currentReportData.filter(inv => { if(!search) return true; return String(inv.invoiceNumber).toLowerCase().includes(search) || inv.clientName.toLowerCase().includes(search) || inv.rnc.toLowerCase().includes(search); }); updateReportTable(); }
+function updateReportTable() { const tbody = document.getElementById('reportTableBody'); if(!tbody) return; if(currentReportFiltered.length===0) { tbody.innerHTML='<tr><td colspan="7" class="text-center p-8">No hay facturas</td></tr>'; updateStats(0,0,0); return; } let total=0, tax=0, html=''; for(var inv of currentReportFiltered) { total+=inv.total; tax+=inv.tax; html += `<tr><td><span class="font-mono font-semibold gradient-text">${inv.invoiceNumber}</span></td><td>${inv.date}</td><td>${escapeHtml(inv.clientName)}</td><td>${formatCurrency(inv.subtotal)}</td><td>${formatCurrency(inv.tax)}</td><td><span class="font-bold gradient-text">${formatCurrency(inv.total)}</span></td><td><button onclick="viewInvoice(${inv.id})" style="color:var(--primary);background:none;border:none;"><i class="fas fa-eye"></i></button></td></tr>`; } html += `<tr style="background:var(--gray-100);font-weight:bold;"><td colspan="3" class="text-right">TOTALES:</td><td>${formatCurrency(currentReportFiltered.reduce((s,i)=>s+i.subtotal,0))}</td><td>${formatCurrency(tax)}</td><td style="color:var(--primary);">${formatCurrency(total)}</td><td></td></tr>`; tbody.innerHTML=html; updateStats(currentReportFiltered.length,total,tax); const info=document.getElementById('reportCountInfo'); if(info) info.innerHTML=`Mostrando ${currentReportFiltered.length} de ${currentReportData.length} facturas | Total: ${formatCurrency(total)}`; }
+function updateStats(t,v,i) { const e=(id,val)=>{const el=document.getElementById(id); if(el) el.innerHTML=val;}; e('statsTotalFacturas',t); e('statsTotalVentas',formatCurrency(v)); e('statsTotalITBIS',formatCurrency(i)); e('statsTicketPromedio',formatCurrency(t>0?v/t:0)); }
+function clearFilters() { const from=document.getElementById('reportFrom'), to=document.getElementById('reportTo'), search=document.getElementById('reportSearchInput'); if(from) { const d=new Date(); d.setDate(1); from.value=d.toISOString().split('T')[0]; } if(to) to.value=getCurrentISODate(); if(search) search.value=''; filterReports(); }
+function exportToExcel() { if(currentReportFiltered.length===0) { Swal.fire('Sin datos', 'No hay datos para exportar', 'warning'); return; } const data = currentReportFiltered.map(i=>({Factura:i.invoiceNumber,Fecha:i.date,Cliente:i.clientName,RNC:i.rnc,Subtotal:i.subtotal,ITBIS:i.tax,Total:i.total,Pago:i.paymentMethod})); const ws = XLSX.utils.json_to_sheet(data), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Reporte'); XLSX.writeFile(wb, `reporte_${Date.now()}.xlsx`); Swal.fire('Exportado', 'Archivo Excel generado', 'success'); }
+function exportToPDF() { if(currentReportFiltered.length===0) { Swal.fire('Sin datos', 'No hay datos para exportar', 'warning'); return; } if(typeof window.jspdf==='undefined'||!window.jspdf.jsPDF) { Swal.fire('Error', 'PDF no disponible', 'error'); return; } const doc = new window.jspdf.jsPDF({ orientation:'landscape' }); doc.setFontSize(16); doc.setTextColor(102,126,234); doc.text('FrioFantasy - Reporte de Facturas',14,15); doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(`Generado: ${new Date().toLocaleString()}`,14,25); const body = currentReportFiltered.map(i=>[String(i.invoiceNumber),i.date,i.clientName,formatCurrency(i.subtotal),formatCurrency(i.tax),formatCurrency(i.total)]); body.push(['','','','','','']); body.push(['','','TOTAL GENERAL:','','',formatCurrency(currentReportFiltered.reduce((s,i)=>s+i.total,0))]); if(doc.autoTable) doc.autoTable({ head:[['Factura','Fecha','Cliente','Subtotal','ITBIS','Total']], body, startY:35, theme:'striped', headStyles:{fillColor:[102,126,234]} }); doc.save(`reporte_${Date.now()}.pdf`); Swal.fire('Exportado', 'PDF generado', 'success'); }
+
+function renderCash() {
+  const movimientos = appData.cashSessions.movimientos || [];
+  let movHtml = '';
+  if (movimientos.length === 0) {
+    movHtml = '<p class="text-center py-6" style="color:var(--gray-600);">No hay movimientos registrados</p>';
+  } else {
+    const ultimos = movimientos.slice(0, 10);
+    movHtml = ultimos.map(m => `
+      <div class="flex items-center justify-between py-3" style="border-bottom:1px solid var(--gray-200);">
+        <div class="flex items-center gap-3">
+          <div style="width:36px;height:36px;border-radius:10px;background:${m.tipo==='ingreso'?'#48bb7820':'#f5656520'};display:flex;align-items:center;justify-content:center;">
+            <i class="fas ${m.tipo==='ingreso'?'fa-arrow-down':'fa-arrow-up'}" style="color:${m.tipo==='ingreso'?'#48bb78':'#f56565'};font-size:0.85rem;"></i>
+          </div>
+          <div>
+            <p class="font-medium text-sm" style="color:var(--dark);">${escapeHtml(m.concepto)}</p>
+            <p class="text-xs" style="color:var(--gray-600);">${m.fecha} · ${m.usuario}</p>
+          </div>
+        </div>
+        <span class="font-bold" style="color:${m.tipo==='ingreso'?'#48bb78':'#f56565'};">${m.tipo==='ingreso'?'+':'-'}${formatCurrency(m.monto)}</span>
+      </div>`).join('');
+  }
+  return `<div class="animate-fade-up max-w-3xl mx-auto space-y-6">
+
+    <!-- Balance Principal -->
+    <div class="rounded-3xl p-8 text-white shadow-2xl text-center" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.08);"></div>
+      <div style="position:absolute;bottom:-50px;left:-20px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
+      <div class="relative">
+        <div style="width:70px;height:70px;border-radius:20px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <i class="fas fa-cash-register text-white text-3xl"></i>
+        </div>
+        <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-bottom:4px;">Efectivo en Caja</p>
+        <p class="text-5xl font-bold text-white" id="cashDisplayAmount">${formatCurrency(appData.cashSessions.currentCash)}</p>
+        <p style="color:rgba(255,255,255,0.5);font-size:0.75rem;margin-top:8px;">Último cierre: ${appData.cashSessions.lastClose || 'No registrado'}</p>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="grid grid-cols-2 gap-4">
+      <button onclick="agregarDineroCaja()" class="glass-card rounded-2xl p-5 flex flex-col items-center gap-2 hover:shadow-xl transition-all" style="border:2px solid #48bb7840;cursor:pointer;">
+        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#48bb78,#68d391);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(72,187,120,0.35);">
+          <i class="fas fa-plus text-white text-xl"></i>
+        </div>
+        <p class="font-bold" style="color:#38a169;">Agregar Dinero</p>
+        <p class="text-xs text-center" style="color:var(--gray-600);">Ingresa efectivo a la caja</p>
+      </button>
+      <button onclick="retirarDineroCaja()" class="glass-card rounded-2xl p-5 flex flex-col items-center gap-2 hover:shadow-xl transition-all" style="border:2px solid #f5656540;cursor:pointer;">
+        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#f56565,#fc8181);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(245,101,101,0.35);">
+          <i class="fas fa-minus text-white text-xl"></i>
+        </div>
+        <p class="font-bold" style="color:#c53030;">Retirar Dinero</p>
+        <p class="text-xs text-center" style="color:var(--gray-600);">Retira efectivo de la caja</p>
+      </button>
+    </div>
+
+    <!-- Historial de Movimientos -->
+    <div class="glass-card rounded-2xl p-6 shadow-xl">
+      <div class="flex items-center gap-3 mb-4">
+        <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#667eea20,#764ba220);display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-history" style="color:var(--primary);"></i>
+        </div>
+        <h3 class="font-bold text-lg" style="color:var(--dark);">Últimos Movimientos</h3>
+      </div>
+      <div id="cashMovimientos">${movHtml}</div>
+    </div>
+
+    <!-- Cerrar Caja -->
+    <button onclick="logoutWithCashClose()" class="w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3" style="background:linear-gradient(135deg,#f56565,#fc8181);color:white;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(245,101,101,0.35);">
+      <i class="fas fa-calculator text-xl"></i> Realizar Arqueo y Cerrar Caja
+    </button>
+  </div>`;
+}
+
+function agregarDineroCaja() {
+  Swal.fire({
+    title: '<i class="fas fa-plus-circle" style="color:#48bb78;"></i> Agregar Dinero',
+    html: `
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold uppercase tracking-wide mb-2 block text-left" style="color:#718096;">Monto a agregar</label>
+          <div class="relative">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:700;color:#48bb78;">RD$</span>
+            <input type="number" id="cashAddAmount" min="1" step="0.01" class="input-premium" style="padding-left:52px;" placeholder="0.00">
+          </div>
+        </div>
+        <div>
+          <label class="text-xs font-semibold uppercase tracking-wide mb-2 block text-left" style="color:#718096;">Concepto</label>
+          <input type="text" id="cashAddConcept" class="input-premium" placeholder="Ej: Apertura de caja, Depósito...">
+        </div>
+      </div>`,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fas fa-check mr-1"></i> Agregar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#48bb78',
+    preConfirm: () => {
+      const monto = parseFloat(document.getElementById('cashAddAmount')?.value);
+      const concepto = document.getElementById('cashAddConcept')?.value?.trim();
+      if (!monto || monto <= 0) { Swal.showValidationMessage('Ingresa un monto válido'); return false; }
+      if (!concepto) { Swal.showValidationMessage('Ingresa un concepto'); return false; }
+      appData.cashSessions.currentCash += monto;
+      appData.cashSessions.movimientos = appData.cashSessions.movimientos || [];
+      appData.cashSessions.movimientos.unshift({ tipo: 'ingreso', monto, concepto, fecha: getCurrentDateTime(), usuario: currentUser?.name || 'Sistema' });
+      saveData();
+      loadModule('cash');
+      Swal.fire({ title: '¡Dinero agregado!', html: `<p class="text-2xl font-bold" style="color:#48bb78;">+${formatCurrency(monto)}</p><p class="text-sm text-gray-500">Nueva caja: ${formatCurrency(appData.cashSessions.currentCash)}</p>`, icon: 'success', timer: 2000, showConfirmButton: false });
+    }
+  });
+}
+
+function retirarDineroCaja() {
+  Swal.fire({
+    title: '<i class="fas fa-minus-circle" style="color:#f56565;"></i> Retirar Dinero',
+    html: `
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold uppercase tracking-wide mb-2 block text-left" style="color:#718096;">Monto a retirar</label>
+          <div class="relative">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:700;color:#f56565;">RD$</span>
+            <input type="number" id="cashRetireAmount" min="1" step="0.01" class="input-premium" style="padding-left:52px;" placeholder="0.00">
+          </div>
+        </div>
+        <div>
+          <label class="text-xs font-semibold uppercase tracking-wide mb-2 block text-left" style="color:#718096;">Concepto</label>
+          <input type="text" id="cashRetireConcept" class="input-premium" placeholder="Ej: Gasto operativo, Pago de proveedor...">
+        </div>
+      </div>`,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fas fa-check mr-1"></i> Retirar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#f56565',
+    preConfirm: () => {
+      const monto = parseFloat(document.getElementById('cashRetireAmount')?.value);
+      const concepto = document.getElementById('cashRetireConcept')?.value?.trim();
+      if (!monto || monto <= 0) { Swal.showValidationMessage('Ingresa un monto válido'); return false; }
+      if (!concepto) { Swal.showValidationMessage('Ingresa un concepto'); return false; }
+      if (monto > appData.cashSessions.currentCash) { Swal.showValidationMessage(`No hay suficiente efectivo. Disponible: ${formatCurrency(appData.cashSessions.currentCash)}`); return false; }
+      appData.cashSessions.currentCash -= monto;
+      appData.cashSessions.movimientos = appData.cashSessions.movimientos || [];
+      appData.cashSessions.movimientos.unshift({ tipo: 'retiro', monto, concepto, fecha: getCurrentDateTime(), usuario: currentUser?.name || 'Sistema' });
+      saveData();
+      loadModule('cash');
+      Swal.fire({ title: 'Retiro registrado', html: `<p class="text-2xl font-bold" style="color:#f56565;">-${formatCurrency(monto)}</p><p class="text-sm text-gray-500">Nueva caja: ${formatCurrency(appData.cashSessions.currentCash)}</p>`, icon: 'success', timer: 2000, showConfirmButton: false });
+    }
+  });
+}
+
+function manualCashClose() { Swal.fire('Arqueo de Caja', `Total en caja: ${formatCurrency(appData.cashSessions.currentCash)}`, 'info'); }
+
+function renderConfig() {
+  return `<div class="animate-fade-up">
+    <div class="max-w-4xl mx-auto space-y-6">
+
+      <!-- Header Banner -->
+      <div class="rounded-3xl p-8 text-white shadow-2xl" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
+        <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.08);"></div>
+        <div style="position:absolute;bottom:-60px;left:-20px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
+        <div class="relative flex items-center gap-5">
+          <div style="width:72px;height:72px;border-radius:20px;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+            <i class="fas fa-cog text-white text-3xl"></i>
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-1">Configuración del Sistema</h2>
+            <p style="color:rgba(255,255,255,0.7);">Personaliza FrioFantasy según las necesidades de tu negocio</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="grid md:grid-cols-2 gap-6">
+
+        <!-- Card: Datos Fiscales -->
+        <div class="glass-card rounded-2xl p-6 shadow-xl">
+          <div class="flex items-center gap-3 mb-6">
+            <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#667eea20,#764ba220);display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-building" style="color:var(--primary);font-size:1.2rem;"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg" style="color:var(--dark);">Datos de la Empresa</h3>
+              <p class="text-xs" style="color:var(--gray-600);">Información fiscal y de contacto</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs font-semibold uppercase tracking-wide mb-2 block" style="color:var(--gray-600);">
+                <i class="fas fa-store mr-1" style="color:var(--primary);"></i> Nombre de la Empresa
+              </label>
+              <input id="configName" value="${escapeHtml(systemConfig.companyName)}" class="input-premium" placeholder="FrioFantasy">
+            </div>
+            <div>
+              <label class="text-xs font-semibold uppercase tracking-wide mb-2 block" style="color:var(--gray-600);">
+                <i class="fas fa-id-card mr-1" style="color:var(--primary);"></i> RNC / Registro Fiscal
+              </label>
+              <input id="configRnc" value="${escapeHtml(systemConfig.companyRnc)}" class="input-premium" placeholder="000-000000-0">
+            </div>
+            <div>
+              <label class="text-xs font-semibold uppercase tracking-wide mb-2 block" style="color:var(--gray-600);">
+                <i class="fas fa-phone mr-1" style="color:var(--primary);"></i> Teléfono
+              </label>
+              <input id="configPhone" value="${escapeHtml(systemConfig.companyPhone)}" class="input-premium" placeholder="809-000-0000">
+            </div>
+            <div>
+              <label class="text-xs font-semibold uppercase tracking-wide mb-2 block" style="color:var(--gray-600);">
+                <i class="fas fa-map-marker-alt mr-1" style="color:var(--primary);"></i> Dirección
+              </label>
+              <input id="configAddress" value="${escapeHtml(systemConfig.companyAddress)}" class="input-premium" placeholder="Calle, Ciudad">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Impuestos + Info del sistema -->
+        <div class="space-y-6">
+          <div class="glass-card rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center gap-3 mb-6">
+              <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#48bb7820,#68d39120);display:flex;align-items:center;justify-content:center;">
+                <i class="fas fa-percent" style="color:var(--success);font-size:1.2rem;"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg" style="color:var(--dark);">Configuración Fiscal</h3>
+                <p class="text-xs" style="color:var(--gray-600);">Tasas de impuestos</p>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold uppercase tracking-wide mb-2 block" style="color:var(--gray-600);">
+                <i class="fas fa-receipt mr-1" style="color:var(--success);"></i> ITBIS (%)
+              </label>
+              <div class="relative">
+                <input type="number" id="configItbis" value="${systemConfig.itbisRate}" class="input-premium pr-12" min="0" max="100" step="0.5">
+                <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--success);">%</span>
+              </div>
+              <p class="text-xs mt-2" style="color:var(--gray-600);">Impuesto a la Transferencia de Bienes Industrializados y Servicios</p>
+            </div>
+          </div>
+
+          <!-- Card: Info del sistema -->
+          <div class="rounded-2xl p-6" style="background:linear-gradient(135deg,#1a1c2e,#2d1b4e);">
+            <div class="flex items-center gap-3 mb-4">
+              <i class="fas fa-ice-cream text-3xl" style="color:#a78bfa;"></i>
+              <div>
+                <p class="text-white font-bold text-lg">FrioFantasy</p>
+                <p style="color:rgba(255,255,255,0.5);font-size:0.75rem;">Enterprise v7.0</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span style="color:rgba(255,255,255,0.5);">Versión</span>
+                <span class="text-white font-medium">7.0.0</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span style="color:rgba(255,255,255,0.5);">Usuarios activos</span>
+                <span class="text-white font-medium">${appData.users.filter(u=>u.active).length}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span style="color:rgba(255,255,255,0.5);">Productos</span>
+                <span class="text-white font-medium">${appData.products.length}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span style="color:rgba(255,255,255,0.5);">Clientes</span>
+                <span class="text-white font-medium">${appData.customers.length}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PayPal -->
+      <div class="glass-card rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center gap-3 mb-4">
+          <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#003087,#009cde);display:flex;align-items:center;justify-content:center;">
+            <i class="fab fa-paypal text-white text-xl"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg" style="color:var(--dark);">Pagar / Donar con PayPal</h3>
+            <p class="text-xs" style="color:var(--gray-600);">Apoya el desarrollo de FrioFantasy</p>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <div class="flex-1">
+            <p class="text-sm mb-1" style="color:var(--gray-600);">Realiza un pago o donación segura a través de PayPal. Puedes elegir el monto que desees.</p>
+            <p class="text-xs font-mono" style="color:var(--primary);">catanotejeda16@gmail.com</p>
+          </div>
+          <a href="https://www.paypal.com/donate/?business=catanotejeda16%40gmail.com&no_recurring=0&currency_code=USD"
+             target="_blank" rel="noopener"
+             style="background:linear-gradient(135deg,#003087,#009cde);white-space:nowrap;text-decoration:none;min-width:180px;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 24px;border-radius:16px;font-weight:700;color:white;box-shadow:0 6px 20px rgba(0,48,135,0.3);transition:opacity 0.2s;">
+            <i class="fab fa-paypal text-xl"></i>
+            Pagar con PayPal
+          </a>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <button onclick="saveConfig()" class="btn-primary w-full py-4 text-lg font-bold rounded-2xl flex items-center justify-center gap-3" style="box-shadow:0 10px 30px rgba(102,126,234,0.4);">
+        <i class="fas fa-save text-xl"></i>
+        Guardar Configuración
+      </button>
+
+      <!-- Reset Data -->
+      <div class="glass-card rounded-2xl p-5 shadow-xl" style="border:1px solid #f5656530;">
+        <div class="flex items-center gap-3 mb-3">
+          <div style="width:40px;height:40px;border-radius:12px;background:#f5656520;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-trash-alt" style="color:#f56565;"></i>
+          </div>
+          <div>
+            <h3 class="font-bold" style="color:var(--dark);">Zona de Peligro</h3>
+            <p class="text-xs" style="color:var(--gray-600);">Acciones irreversibles</p>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <button onclick="clearAllProducts()" class="py-3 rounded-xl font-semibold text-sm" style="background:#f5656520;color:#f56565;border:1px solid #f5656540;cursor:pointer;"><i class="fas fa-box mr-1"></i> Limpiar Productos</button>
+          <button onclick="clearAllCustomers()" class="py-3 rounded-xl font-semibold text-sm" style="background:#ed893620;color:#ed8936;border:1px solid #ed893640;cursor:pointer;"><i class="fas fa-users mr-1"></i> Limpiar Clientes</button>
+          <button onclick="clearAllData()" class="py-3 rounded-xl font-semibold text-sm" style="background:#f5656540;color:#c53030;border:1px solid #f56565;cursor:pointer;font-weight:700;"><i class="fas fa-bomb mr-1"></i> Borrar Todo</button>
+        </div>
+      </div>
+
+    </div>
+  </div>`;
+}
+function saveConfig() { systemConfig.itbisRate = safeParseFloat(document.getElementById('configItbis')?.value); systemConfig.companyName = document.getElementById('configName')?.value; systemConfig.companyRnc = document.getElementById('configRnc')?.value; systemConfig.companyPhone = document.getElementById('configPhone')?.value; systemConfig.companyAddress = document.getElementById('configAddress')?.value; saveData(); Swal.fire('Guardado', 'Configuración actualizada', 'success'); }
+
+function clearAllProducts() { Swal.fire({ title: 'Limpiar Productos', text: '¿Eliminar TODOS los productos del inventario?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#f56565', confirmButtonText: 'Sí, eliminar todo' }).then(res => { if(res.isConfirmed) { appData.products = []; saveData(); loadModule('config'); Swal.fire({ title: 'Listo', text: 'Todos los productos eliminados', icon: 'success', timer: 1500, showConfirmButton: false }); } }); }
+function clearAllCustomers() { Swal.fire({ title: 'Limpiar Clientes', text: '¿Eliminar TODOS los clientes?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ed8936', confirmButtonText: 'Sí, eliminar todo' }).then(res => { if(res.isConfirmed) { appData.customers = []; saveData(); loadModule('config'); Swal.fire({ title: 'Listo', text: 'Todos los clientes eliminados', icon: 'success', timer: 1500, showConfirmButton: false }); } }); }
+function clearAllData() { Swal.fire({ title: '⚠️ BORRAR TODO', html: '<p>Esto eliminará <strong>productos, clientes, facturas, pedidos y movimientos de caja</strong>.</p><p class="mt-2 text-red-500 font-bold">Esta acción no se puede deshacer.</p>', icon: 'warning', showCancelButton: true, confirmButtonColor: '#c53030', confirmButtonText: 'BORRAR TODO', cancelButtonText: 'Cancelar' }).then(res => { if(res.isConfirmed) { appData.products = []; appData.customers = []; appData.invoices = []; appData.salesWithoutInvoice = []; appData.orders = []; appData.cashSessions = { open: true, currentCash: 0, lastClose: null, movimientos: [] }; appData.nextInvoiceId = 1001; appData.nextTicketId = 5001; appData.nextOrderId = 3001; saveData(); loadModule('config'); Swal.fire({ title: 'Sistema limpio', text: 'Todos los datos han sido eliminados', icon: 'success', timer: 2000, showConfirmButton: false }); } }); }
+
+function showHelp() { Swal.fire({ title: '<i class="fas fa-question-circle"></i> Centro de Ayuda', html: `<div class="text-left"><p class="font-bold mb-3">Atajos Rápidos</p><div class="space-y-2"><p class="text-sm"><i class="fas fa-cash-register w-6 text-indigo-500"></i> POS - Ventas</p><p class="text-sm"><i class="fas fa-boxes w-6 text-blue-500"></i> Inventario</p><p class="text-sm"><i class="fas fa-chart-line w-6 text-orange-500"></i> Reportes</p><p class="text-sm"><i class="fas fa-globe w-6 text-green-500"></i> Datos Web - Pedidos online</p></div><hr class="my-4"><p class="text-xs text-gray-500 text-center">FrioFantasy Enterprise v7.0 🍦</p></div>`, icon: 'info', confirmButtonColor: '#667eea' }); }
+
+// ======================== POLLING DE PEDIDOS WEB ========================
+let _ultimoPedidoWebVisto = null;
+
+function checkNuevosPedidosWeb() {
+  if (!currentUser) return;
+  const stored = localStorage.getItem('friofantasy_webhook_data');
+  if (!stored) return;
+  try {
+    const parsed = JSON.parse(stored);
+
+    // Detectar pedidos nuevos
+    const pedidos = parsed.pedidos || [];
+    const pedidosNoNotificados = pedidos.filter(p => {
+      const key = 'friofantasy_notif_' + (p.orderNumber || p.id);
+      return !localStorage.getItem(key);
+    });
+    for (const pedido of pedidosNoNotificados) {
+      const key = 'friofantasy_notif_' + (pedido.orderNumber || pedido.id);
+      localStorage.setItem(key, '1');
+      agregarNotificacionWeb({ tipo: 'pedido', datos: pedido });
+      const moduleContent = document.getElementById('moduleContent');
+      if (moduleContent && (moduleContent.innerHTML.includes('Pedidos') || moduleContent.innerHTML.includes('Gestiona pedidos'))) {
+        loadModule('orders');
+      }
+    }
+
+    // Detectar clientes nuevos
+    const clientes = parsed.clientes || [];
+    const clientesNoNotificados = clientes.filter(c => {
+      const key = 'friofantasy_notif_cli_' + (c.email || c.id);
+      return !localStorage.getItem(key);
+    });
+    for (const cliente of clientesNoNotificados) {
+      const key = 'friofantasy_notif_cli_' + (cliente.email || cliente.id);
+      localStorage.setItem(key, '1');
+      agregarNotificacionWeb({ tipo: 'cliente', datos: cliente });
+      const moduleContent = document.getElementById('moduleContent');
+      if (moduleContent && moduleContent.innerHTML.includes('Clientes')) {
+        loadModule('customers');
+      }
+    }
+
+  } catch(e) {}
+}
+
+// ======================== LOGIN ========================
+function handleLogin() {
+  const user = document.getElementById('loginUsername').value, pass = document.getElementById('loginPassword').value;
+  const found = appData.users.find(u => u.username === user && u.password === pass && u.active);
+  if(found) {
+    currentUser = found;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('sidebar').style.display = 'flex';
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('floatBtn').style.display = 'flex';
+    document.getElementById('mobileMenuBtn').style.display = 'flex';
+    document.getElementById('sidebarUserName').innerHTML = found.name;
+    document.getElementById('sidebarUserRole').innerHTML = found.role === 'administrador' ? 'Administrador' : 'Cajero';
+    const headerUser = document.getElementById('headerUserName'); if(headerUser) headerUser.innerHTML = found.name;
+    const headerRole = document.getElementById('headerUserRole'); if(headerRole) headerRole.innerHTML = found.role === 'administrador' ? 'Administrador' : 'Cajero';
+    renderSidebarMenu();
+    loadModule(found.permissions[0] || 'pos');
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    cargarDatosWeb();
+    cargarNotificaciones();
+    // Polling cada 5 segundos para detectar pedidos nuevos de la web
+    window._webPollInterval = setInterval(checkNuevosPedidosWeb, 5000);
+    Swal.fire({ title: 'Bienvenido', text: `Hola ${found.name}`, icon: 'success', timer: 1500, showConfirmButton: false });
+  } else Swal.fire('Error', 'Credenciales inválidas. Verifica tu usuario y contraseña.', 'error');
+}
+
+function logoutWithCashClose() {
+  Swal.fire({ title: 'Cerrar Caja', text: `Total: ${formatCurrency(appData.cashSessions.currentCash)}`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Cerrar' }).then(res => {
+    if(res.isConfirmed) {
+      appData.cashSessions.currentCash = 0;
+      appData.cashSessions.lastClose = getCurrentDateTime();
+      saveData();
+      // Detener polling
+      if (window._webPollInterval) { clearInterval(window._webPollInterval); window._webPollInterval = null; }
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('sidebar').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('floatBtn').style.display = 'none';
+      document.getElementById('mobileMenuBtn').style.display = 'none';
+      currentUser = null;
+      currentCart = [];
+      // Limpiar campos para que entre otra persona
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginUsername').focus();
+    }
+  });
+}
+
+// ======================== NAVEGACIÓN ========================
+const modulesMap = { pos: { render: renderPOS, title: "Punto de Venta", subtitle: "Realiza ventas rápidas" }, inventory: { render: renderInventory, title: "Inventario", subtitle: "Gestiona productos" }, customers: { render: renderCustomers, title: "Clientes", subtitle: "Administra clientes" }, invoices_history: { render: renderInvoicesHistory, title: "Facturas", subtitle: "Historial de ventas" }, orders: { render: renderOrders, title: "Pedidos", subtitle: "Gestiona pedidos (incluye web)" }, reports: { render: renderReports, title: "Reportes", subtitle: "Análisis financiero" }, cash: { render: renderCash, title: "Caja", subtitle: "Gestión de efectivo" }, users: { render: renderUsers, title: "Usuarios", subtitle: "Gestión de usuarios y permisos" }, config: { render: renderConfig, title: "Configuración", subtitle: "Ajustes del sistema" }, webdata: { render: renderWebData, title: "Datos Web", subtitle: "Pedidos, clientes y suscripciones de la tienda online" } };
+
+function loadModule(moduleName) {
+  if(!currentUser?.permissions?.includes(moduleName)) { Swal.fire('Acceso denegado', 'No tienes permisos', 'error'); return; }
+  const module = modulesMap[moduleName];
+  if(module) {
+    document.getElementById('moduleContent').innerHTML = module.render();
+    document.getElementById('pageTitle').innerHTML = module.title;
+    document.getElementById('pageSubtitle').innerHTML = module.subtitle;
+    // Resaltar menú activo
+    document.querySelectorAll('.menu-item').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector(`.menu-item[onclick="loadModule('${moduleName}')"]`);
+    if(activeBtn) activeBtn.classList.add('active');
+    if(moduleName === 'pos') setTimeout(updateCartUI, 100);
+    if(moduleName === 'reports') setTimeout(filterReports, 200);
+    if(moduleName === 'webdata') setTimeout(() => { cargarDatosWeb(); }, 100);
+  }
+}
+
+// ======================== INICIALIZAR ========================
+loadData();
+cargarDatosWeb();
+cargarNotificaciones();
+
+document.getElementById('sidebar').style.display = 'none';
+document.getElementById('mainContent').style.display = 'none';
+document.getElementById('floatBtn').style.display = 'none';
+document.getElementById('mobileMenuBtn').style.display = 'none';
+document.getElementById('loginUsername').value = '';
+document.getElementById('loginPassword').value = '';
+
+setTimeout(() => { saveData(); console.log("Sistema listo 🍦 FrioFantasy"); }, 100);
+
+// ======================== FIREBASE INTEGRATION ========================
+const FIREBASE_CONFIG = { databaseURL: "https://basedatos-92fd6-default-rtdb.firebaseio.com/" };
+
+let firebaseDB = null;
+let firebaseListenerActive = false;
+let pedidosYaVistosFirebase = new Set();
+
+// ── Cola offline ────────────────────────────────────────────────────────────
+function vaciarColaOffline() {
+  const cola = JSON.parse(localStorage.getItem('ff_cola_offline') || '[]');
+  if (!firebaseDB || cola.length === 0) return;
+  console.log('🔥 Vaciando cola offline:', cola.length, 'pendiente(s)');
+  const d = JSON.parse(localStorage.getItem('friofantasy_data_v10') || '{}');
+  if (d.products !== undefined) firebaseSyncTodas(d);
+  localStorage.setItem('ff_cola_offline', '[]');
+  actualizarIndicadorRed();
+  Swal.fire({ title: '¡Sincronizado!', text: 'Los cambios offline fueron guardados en Firebase', icon: 'success', timer: 3000, showConfirmButton: false, toast: true, position: 'top-end' });
+}
+
+// ── Indicador visual de red ──────────────────────────────────────────────────
+function actualizarIndicadorRed() {
+  const dot   = document.getElementById('networkDot');
+  const icon  = document.getElementById('networkIcon');
+  const label = document.getElementById('networkLabel');
+  const badge = document.getElementById('pendingBadge');
+  const ind   = document.getElementById('networkIndicator');
+  if (!dot) return;
+  const online = navigator.onLine;
+  const cola   = JSON.parse(localStorage.getItem('ff_cola_offline') || '[]');
+  if (online) {
+    dot.style.background = '#48bb78'; icon.style.color = '#48bb78';
+    icon.className = 'fas fa-wifi'; label.style.color = '#48bb78';
+    label.textContent = 'En línea'; if (ind) ind.style.background = 'var(--gray-100)';
+  } else {
+    dot.style.background = '#f56565'; icon.style.color = '#f56565';
+    icon.className = 'fas fa-times-circle'; label.style.color = '#f56565';
+    label.textContent = 'Sin internet'; if (ind) ind.style.background = '#fff5f5';
+  }
+  if (cola.length > 0) {
+    badge.classList.remove('hidden');
+    badge.textContent = cola.length + ' pendiente' + (cola.length > 1 ? 's' : '');
+  } else { badge.classList.add('hidden'); }
+}
+window.addEventListener('online',  () => { actualizarIndicadorRed(); setTimeout(vaciarColaOffline, 1000); });
+window.addEventListener('offline', () => { actualizarIndicadorRed(); });
+
+// ── Cargar datos desde Firebase al inicio ───────────────────────────────────
+function firebaseLoadData() {
+  if (!firebaseDB) return;
+  firebaseDB.ref('sistema').once('value', snap => {
+    const d = snap.val(); if (!d) { console.log('Firebase vacío — usando datos locales'); return; }
+    try {
+      let changed = false;
+      if (d.productos) { const arr = Object.values(d.productos); if (arr.length >= appData.products.length) { appData.products = arr; changed = true; } }
+      if (d.clientes)  { const arr = Object.values(d.clientes);  if (arr.length >= appData.customers.length) { appData.customers = arr; changed = true; } }
+      if (d.usuarios)  { const arr = Object.values(d.usuarios);  if (arr.length > 0) { appData.users = arr; changed = true; } }
+      if (d.facturas)  { const arr = Object.values(d.facturas);  if (arr.length >= appData.invoices.length) { appData.invoices = arr; const maxId = Math.max(...arr.map(f=>f.invoiceNumber||0)); if (maxId >= appData.nextInvoiceId) appData.nextInvoiceId = maxId + 1; changed = true; } }
+      if (d.ordenes)   { const arr = Object.values(d.ordenes);   if (arr.length >= appData.orders.length)   { appData.orders = arr; changed = true; } }
+      if (d.caja)      { appData.cashSessions = d.caja; changed = true; }
+      if (d.config)    { systemConfig = { ...systemConfig, ...d.config }; changed = true; }
+      if (d.contadores){ appData.nextInvoiceId = Math.max(appData.nextInvoiceId, d.contadores.nextInvoiceId||0); appData.nextTicketId = Math.max(appData.nextTicketId, d.contadores.nextTicketId||0); appData.nextOrderId = Math.max(appData.nextOrderId, d.contadores.nextOrderId||0); }
+      if (changed) {
+        localStorage.setItem('friofantasy_data_v10', JSON.stringify({ products: appData.products, customers: appData.customers, invoices: appData.invoices, salesWithoutInvoice: appData.salesWithoutInvoice, orders: appData.orders, users: appData.users, cashSessions: appData.cashSessions, nextInvoiceId: appData.nextInvoiceId, nextTicketId: appData.nextTicketId, nextOrderId: appData.nextOrderId, systemConfig: systemConfig }));
+        console.log('🔥 Datos cargados desde Firebase');
+      }
+    } catch(e) { console.warn('Error cargando desde Firebase:', e); }
+  });
+}
+
+function initFirebase() {
+  try {
+    if (!firebase.apps.length) { firebase.initializeApp(FIREBASE_CONFIG); }
+    firebaseDB = firebase.database();
+    // Indicador preciso usando Firebase .info/connected
+    firebaseDB.ref('.info/connected').on('value', snap => {
+      const connected = snap.val();
+      const dot = document.getElementById('networkDot'), icon = document.getElementById('networkIcon');
+      const label = document.getElementById('networkLabel'), ind = document.getElementById('networkIndicator');
+      if (!dot) return;
+      if (connected) {
+        dot.style.background='#48bb78'; icon.style.color='#48bb78'; icon.className='fas fa-wifi';
+        label.style.color='#48bb78'; label.textContent='En línea'; if(ind) ind.style.background='var(--gray-100)';
+        document.getElementById('pendingBadge')?.classList.add('hidden');
+        // Vaciar cola si hay pendientes
+        const cola = JSON.parse(localStorage.getItem('ff_cola_offline')||'[]');
+        if (cola.length > 0) setTimeout(vaciarColaOffline, 800);
+      } else {
+        dot.style.background='#f56565'; icon.style.color='#f56565'; icon.className='fas fa-times-circle';
+        label.style.color='#f56565'; label.textContent='Sin internet'; if(ind) ind.style.background='#fff5f5';
+        actualizarIndicadorRed();
+      }
+    });
+    console.log("🔥 Firebase iniciado");
+    return true;
+  } catch(e) { console.error("❌ Error Firebase:", e); return false; }
+}
+
+function escucharPedidosFirebase() {
+  if (!firebaseDB || firebaseListenerActive) return;
+  firebaseListenerActive = true;
+
+  const refPedidos = firebaseDB.ref('pedidos');
+
+  // Primero cargamos los existentes sin notificar (solo marcarlos como vistos)
+  refPedidos.once('value', snapshot => {
+    const datos = snapshot.val();
+    if (datos) {
+      Object.keys(datos).forEach(key => {
+        pedidosYaVistosFirebase.add(key);
+        // Sincronizar con webData local
+        const pedido = datos[key];
+        const yaExiste = webData.pedidos.some(p => p.firebaseKey === key || p.orderNumber === pedido.orderNumber);
+        if (!yaExiste) {
+          webData.pedidos.unshift({ ...pedido, firebaseKey: key });
+        }
+      });
+      localStorage.setItem('friofantasy_webhook_data', JSON.stringify(webData));
+      console.log(`🔥 Firebase: ${Object.keys(datos).length} pedidos existentes cargados`);
+    }
+  });
+
+  // Luego escuchamos nuevos en tiempo real
+  refPedidos.on('child_added', snapshot => {
+    const key = snapshot.key;
+    const pedido = snapshot.val();
+
+    // Si ya lo teníamos al cargar, ignoramos
+    if (pedidosYaVistosFirebase.has(key)) return;
+    pedidosYaVistosFirebase.add(key);
+
+    console.log("🔥 Nuevo pedido desde Firebase:", pedido);
+
+    // Agregar a webData local
+    const yaExiste = webData.pedidos.some(p => p.orderNumber === pedido.orderNumber || p.firebaseKey === key);
+    if (!yaExiste) {
+      webData.pedidos.unshift({ ...pedido, firebaseKey: key });
+      localStorage.setItem('friofantasy_webhook_data', JSON.stringify(webData));
+    }
+
+    // Notificación solo si hay usuario logueado
+    if (!currentUser) return;
+    agregarNotificacionWeb({ tipo: 'pedido', datos: pedido });
+
+    // Refrescar módulo de pedidos si está abierto
+    const mc = document.getElementById('moduleContent');
+    if (mc && mc.innerHTML.includes('Gestiona pedidos')) {
+      loadModule('orders');
+    }
+  });
+
+  // Escuchar cambios de estado (completado, etc.)
+  refPedidos.on('child_changed', snapshot => {
+    const key = snapshot.key;
+    const pedido = snapshot.val();
+    const idx = webData.pedidos.findIndex(p => p.firebaseKey === key || p.orderNumber === pedido.orderNumber);
+    if (idx !== -1) {
+      webData.pedidos[idx] = { ...pedido, firebaseKey: key };
+      localStorage.setItem('friofantasy_webhook_data', JSON.stringify(webData));
+    }
+    const mc = document.getElementById('moduleContent');
+    if (mc && (mc.innerHTML.includes('Gestiona pedidos') || mc.innerHTML.includes('Datos de la Web'))) {
+      loadModule('orders');
+    }
+  });
+}
+
+function marcarPedidoCompletadoFirebase(orderNumber, firebaseKey) {
+  if (!firebaseDB) return;
+  // Buscar la key si no la tenemos
+  if (!firebaseKey) {
+    firebaseDB.ref('pedidos').orderByChild('orderNumber').equalTo(orderNumber).once('value', snap => {
+      snap.forEach(child => {
+        child.ref.update({ estado: 'completado' });
+      });
+    });
+  } else {
+    firebaseDB.ref('pedidos/' + firebaseKey).update({ estado: 'completado' });
+  }
+}
+
+// Inicializar Firebase al cargar la página
+actualizarIndicadorRed(); // Estado inicial antes de que Firebase confirme
+if (initFirebase()) {
+  escucharPedidosFirebase();
+  // Cargar datos desde Firebase (tiene prioridad sobre localStorage)
+  firebaseLoadData();
+  // Si hay datos locales y Firebase está vacío, subirlos
+  setTimeout(() => {
+    if (firebaseDB && navigator.onLine) {
+      const d = JSON.parse(localStorage.getItem('friofantasy_data_v10') || '{}');
+      if (d.products !== undefined) { firebaseSyncTodas(d); console.log('🔥 Datos locales subidos a Firebase'); }
+    }
+  }, 2000);
+}
+
+</script>
+</body>
+</html>
